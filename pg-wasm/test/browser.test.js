@@ -88,6 +88,38 @@ const port = 8000 + Math.floor(Math.random() * 1000);
 			console.log(`${p}: rendered, ${errs} error box(es)`);
 		}
 
+		// Open Problem Library (when the build includes it, --opl)
+		if (fs.existsSync(path.join(dist, 'opl', 'index.json'))) {
+			const imagesLoaded = () => page.waitForFunction(() => {
+				const d = document.getElementById('problem-frame').contentDocument;
+				const imgs = d ? [...d.querySelectorAll('#problem_body img')] : [];
+				return imgs.length > 0 && imgs.every((i) => i.complete && i.naturalWidth > 0);
+			}, null, { timeout: 30000 });
+			for (const [p, name] of [['Library/AlfredUniv/diffeq/modeling/lrseriescircuit.pg', '4-opl-image'],
+				['Library/Mizzou/Algebra/graph_linear/determine_slope_from_graph_05.pg', '5-opl-gd-graph']]) {
+				await page.goto(`http://localhost:${port}/?problem=${encodeURIComponent(p)}`);
+				await frame.locator('#problem_body').waitFor({ timeout: 60000 });
+				await imagesLoaded();
+				assert.strictEqual(await frame.locator('.alert-danger').count(), 0, `${p} has errors`);
+				await page.screenshot({ path: path.join(shots, `${name}.png`) });
+				console.log(`${p}: rendered with images`);
+			}
+			// Library browser: pick a subject, chapter, section and problem
+			await page.locator('#tab-library').click();
+			await page.locator('#library-browser').waitFor();
+			await page.selectOption('#lib-subject', 'Calculus - single variable');
+			await page.selectOption('#lib-chapter', 'Differentiation');
+			const section = await page.locator('#lib-section option').nth(1).getAttribute('value');
+			await page.selectOption('#lib-section', section);
+			const first = await page.locator('#lib-problems option').first().getAttribute('value');
+			await page.selectOption('#lib-problems', first);
+			await page.waitForFunction((p) => location.search.includes(encodeURIComponent(p)), first, { timeout: 30000 });
+			await frame.locator('#problem_body').waitFor({ timeout: 60000 });
+			await page.waitForTimeout(1000);
+			await page.screenshot({ path: path.join(shots, '6-library-browser.png') });
+			console.log(`library browser: ${section} -> ${first}`);
+		}
+
 		const bad = logs.filter((l) => /error/i.test(l) && !/favicon/.test(l));
 		if (bad.length) console.log('Console errors:\n' + bad.join('\n'));
 		console.log('browser test passed');

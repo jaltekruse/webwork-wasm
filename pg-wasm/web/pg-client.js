@@ -37,6 +37,7 @@
 					if (msg.type === 'status') this.onStatus(msg.text);
 					else if (msg.type === 'ready') {
 						this.timing = msg.timing;
+						this.config = msg.config ?? {};
 						this.onStatus('Ready');
 						resolve(msg);
 					} else if (msg.type === 'init-error') {

@@ -17,7 +17,8 @@ if (!output || !roots.length) {
 }
 
 const tag = (src, name) => {
-	const m = src.match(new RegExp(`^\\s*#+\\s*${name}\\s*\\(\\s*['"]?([^'")\\n]*?)['"]?\\s*\\)`, 'im'));
+	// (some tags lack the closing parenthesis)
+	const m = src.match(new RegExp(`^\\s*#+\\s*${name}\\s*\\(\\s*['"]?([^'")\\n]*?)['"]?\\s*(\\)|$)`, 'im'));
 	return m && m[1].trim() ? m[1].trim().replace(/\s+/g, ' ') : null;
 };
 

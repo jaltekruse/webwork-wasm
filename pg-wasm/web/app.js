@@ -242,7 +242,8 @@ $('file-input').addEventListener('change', async (e) => {
 		await pg.ready;
 		initLibrary().catch((e) => console.warn('Library index:', e));
 		const wanted = new URLSearchParams(location.search).get('problem');
-		if (wanted && !wanted.startsWith('problems/')) {
+		// ?problem= can name an example (with or without "problems/") or a library path.
+		if (wanted && !wanted.startsWith('problems/') && first !== 'problems/' + wanted) {
 			showTab('tab-library');
 			$('lib-path').value = wanted;
 			await loadProblem(wanted);
