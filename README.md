@@ -79,6 +79,16 @@ then open <http://localhost:8080/>. `pg-wasm/dist/` is a static site: it can be
 copied to any web server, GitHub Pages, or a USB stick with a small local
 server.
 
+To publish the demo on GitHub Pages:
+
+```bash
+pg-wasm/build.sh --opl-remote
+pg-wasm/tools/publish-gh-pages.sh
+```
+
+then, once, in the repository settings: Pages → Build and deployment → Deploy
+from a branch → `gh-pages`, `/ (root)`.
+
 Tests:
 
 ```bash
