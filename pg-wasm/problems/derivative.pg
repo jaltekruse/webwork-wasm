@@ -1,0 +1,30 @@
+## DESCRIPTION
+## A polynomial derivative, graded as a formula (pg-wasm demo problem)
+## ENDDESCRIPTION
+## KEYWORDS('derivative', 'polynomial')
+
+DOCUMENT();
+loadMacros('PGstandard.pl', 'PGML.pl', 'PGcourse.pl');
+
+Context('Numeric');
+$a = random(2, 9, 1);
+$b = random(2, 9, 1);
+$c = non_zero_random(-9, 9, 1);
+$f = Formula("$a x^3 + $b x^2 + $c")->reduce;
+$df = $f->D('x');
+
+BEGIN_PGML
+Let [`f(x) = [$f]`].
+
+Find the derivative: [`f'(x) = `] [_]{$df}{20}
+END_PGML
+
+BEGIN_PGML_HINT
+Use the power rule: [`\frac{d}{dx} x^n = n x^{n-1}`].
+END_PGML_HINT
+
+BEGIN_PGML_SOLUTION
+[`f'(x) = [$df]`]
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

@@ -1,0 +1,18 @@
+{
+	"name": "pg-wasm",
+	"private": true,
+	"description": "Render and grade WeBWorK PG problems in the browser with Perl compiled to WebAssembly",
+	"license": "GPL-2.0-or-later",
+	"scripts": {
+		"build": "./build.sh",
+		"serve": "node tools/serve.js dist",
+		"test": "node test/node-render.test.js && node test/browser.test.js"
+	},
+	"dependencies": {
+		"bootstrap": "5.3.3",
+		"mathjax": "3.2.2"
+	},
+	"devDependencies": {
+		"js-yaml": "4.1.0"
+	}
+}
