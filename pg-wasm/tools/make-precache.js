@@ -14,6 +14,8 @@ const walk = (dir) => {
 		else {
 			const rel = path.relative(dist, full).split(path.sep).join('/');
 			if (rel === 'precache-manifest.json') continue;
+			// The problem library is cached as problems are used (see sw.js), not up front.
+			if (rel.startsWith('opl/') && rel !== 'opl/index.json') continue;
 			files.push(rel);
 			hash.update(rel).update(fs.readFileSync(full));
 		}

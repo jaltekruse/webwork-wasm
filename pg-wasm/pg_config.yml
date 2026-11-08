@@ -1,0 +1,29 @@
+# PG configuration overrides for the browser build (merged over
+# pg/conf/pg_config.dist.yml at build time).
+#
+# The virtual file system has a webwork2-style course templates directory at
+# /opt/templates. "Library" there is the OPL and "Contrib" is the OPL's
+# Contrib directory. Files under /opt/templates are fetched on demand by the
+# front end (see web/pg-engine.js), so they don't need to be packaged.
+
+directories:
+  OPL: /opt/templates/Library
+  Contrib: /opt/templates/Contrib
+  tmp: /tmp
+  html_temp: /tmp/pg
+  equationCache: /tmp/pg/equations
+  permitted_read_dir: /opt
+  macrosPath:
+    - .
+    - /opt/templates/macros
+    - $pg_root/macros
+    - $pg_root/macros/answers
+    - $pg_root/macros/contexts
+    - $pg_root/macros/core
+    - $pg_root/macros/graph
+    - $pg_root/macros/math
+    - $pg_root/macros/misc
+    - $pg_root/macros/parsers
+    - $pg_root/macros/ui
+    - $pg_root/macros/deprecated
+    - $OPL_dir/macros/PCC

@@ -91,13 +91,31 @@ window.addEventListener('message', (event) => {
 	else if (msg.type === 'pg-resize') frame.style.height = Math.max(msg.height + 4, 150) + 'px';
 });
 
+// URL of a file under the templates directory, using the mounts from pg-wasm-config.json.
+function templateURL(path) {
+	const mounts = Object.entries(pg.config?.mounts ?? {}).sort((a, b) => b[0].length - a[0].length);
+	for (const [dir, url] of mounts) if (path.startsWith(dir)) return url + path.slice(dir.length);
+	return null;
+}
+
+// Loads a problem by its path in the templates directory, e.g.
+// "problems/derivative.pg" or "Library/Rochester/setDerivatives1/c1s5p8.pg".
 async function loadProblem(path) {
-	const res = await fetch('problems/' + path);
-	if (!res.ok) throw new Error(`Could not load ${path}`);
+	await pg.ready;
+	const url = templateURL(path);
+	if (!url) throw new Error(`Unknown location: ${path}`);
+	const res = await fetch(url);
+	if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`);
 	sourceEl.value = await res.text();
 	current.path = path;
+	history.replaceState(null, '', '?problem=' + encodeURIComponent(path));
 	await render();
 }
+
+const showError = (err) => {
+	setStatus('Error', 'danger');
+	frame.srcdoc = `<pre style="color:#b00;white-space:pre-wrap">${escapeHTML(err.message || err)}</pre>`;
+};
 
 async function loadIndex() {
 	const select = $('problem-select');
@@ -119,11 +137,71 @@ async function loadIndex() {
 		}
 		select.append(og);
 	}
-	select.addEventListener('change', () => loadProblem(select.value));
-	const wanted = new URLSearchParams(location.search).get('problem');
-	select.value = index.some((p) => p.path === wanted) ? wanted : index[0].path;
-	return select.value;
+	select.addEventListener('change', () => loadProblem('problems/' + select.value).catch(showError));
+	const wanted = (new URLSearchParams(location.search).get('problem') ?? '').replace(/^problems\//, '');
+	if (index.some((p) => p.path === wanted)) select.value = wanted;
+	return 'problems/' + select.value;
 }
+
+// ##### Problem library browser #####
+
+let library = null;
+const fillSelect = (select, items, placeholder) => {
+	select.replaceChildren(new Option(placeholder, ''), ...items.map(([value, label]) => new Option(label, value)));
+};
+
+async function initLibrary() {
+	const note = $('lib-note');
+	const mounts = pg.config?.mounts ?? {};
+	const where = (mounts['Library/'] ?? '').startsWith('http') ? 'GitHub (needs an internet connection)' : 'this site';
+	note.textContent = `Problems from the Open Problem Library ("Library/...") and Contrib ("Contrib/...") are loaded from ${where}.`;
+	if (!pg.config?.libraryIndex) return;
+	library = await (await fetch(pg.config.libraryIndex)).json();
+	$('library-browser').hidden = false;
+	const subject = $('lib-subject'), chapter = $('lib-chapter'), section = $('lib-section'), list = $('lib-problems');
+	fillSelect(subject, Object.keys(library.tree).map((k) => [k, k]), `Subject (${library.problems.length} problems)`);
+	fillSelect(chapter, [], 'Chapter');
+	fillSelect(section, [], 'Section');
+	subject.addEventListener('change', () => {
+		const chapters = library.tree[subject.value] ?? {};
+		fillSelect(chapter, Object.keys(chapters).map((k) => [k, k]), 'Chapter');
+		fillSelect(section, [], 'Section');
+		list.replaceChildren();
+	});
+	chapter.addEventListener('change', () => {
+		const sections = library.tree[subject.value]?.[chapter.value] ?? {};
+		fillSelect(section, Object.entries(sections).map(([k, v]) => [k, `${k} (${v.length})`]), 'Section');
+		list.replaceChildren();
+	});
+	section.addEventListener('change', () => {
+		const ids = library.tree[subject.value]?.[chapter.value]?.[section.value] ?? [];
+		list.replaceChildren(...ids.map((i) => {
+			const [path, title] = library.problems[i];
+			return new Option(title ? `${title} — ${path}` : path, path);
+		}));
+	});
+	list.addEventListener('change', () => {
+		$('lib-path').value = list.value;
+		loadProblem(list.value).catch(showError);
+	});
+}
+
+$('lib-path-form').addEventListener('submit', (e) => {
+	e.preventDefault();
+	const path = $('lib-path').value.trim().replace(/^\/+/, '');
+	if (path) loadProblem(path).catch(showError);
+});
+
+for (const tab of document.querySelectorAll('[data-panel]')) {
+	tab.addEventListener('click', () => {
+		for (const t of document.querySelectorAll('[data-panel]')) {
+			t.classList.toggle('active', t === tab);
+			t.setAttribute('aria-selected', t === tab);
+			$(t.dataset.panel).hidden = t !== tab;
+		}
+	});
+}
+const showTab = (id) => document.getElementById(id).click();
 
 renderBtn.addEventListener('click', () => render());
 $('new-seed').addEventListener('click', () => {
@@ -140,11 +218,21 @@ sourceEl.addEventListener('keydown', (e) => {
 		sourceEl.setRangeText('\t', sourceEl.selectionStart, sourceEl.selectionEnd, 'end');
 	}
 });
+// Opening files: the .pg file is shown in the editor, and all the selected
+// files (e.g. its images) are written to a directory in the virtual file system
+// so the problem can use them.
+let uploadCount = 0;
 $('file-input').addEventListener('change', async (e) => {
-	const file = e.target.files[0];
-	if (!file) return;
-	sourceEl.value = await file.text();
-	current.path = file.name;
+	const files = [...e.target.files];
+	const pgFile = files.find((f) => /\.pg$/i.test(f.name)) ?? files[0];
+	if (!pgFile) return;
+	const dir = `local/upload${++uploadCount}/`;
+	const contents = {};
+	for (const f of files) contents[f.name] = await f.arrayBuffer();
+	await pg.writeFiles(dir, contents);
+	sourceEl.value = await pgFile.text();
+	current.path = dir + pgFile.name;
+	e.target.value = '';
 	render();
 });
 
@@ -152,10 +240,15 @@ $('file-input').addEventListener('change', async (e) => {
 	try {
 		const first = await loadIndex();
 		await pg.ready;
-		await loadProblem(first);
+		initLibrary().catch((e) => console.warn('Library index:', e));
+		const wanted = new URLSearchParams(location.search).get('problem');
+		if (wanted && !wanted.startsWith('problems/')) {
+			showTab('tab-library');
+			$('lib-path').value = wanted;
+			await loadProblem(wanted);
+		} else await loadProblem(first);
 	} catch (err) {
-		setStatus('Error', 'danger');
-		frame.srcdoc = `<pre style="color:#b00;white-space:pre-wrap">${escapeHTML(err.stack || err)}</pre>`;
+		showError(err);
 	}
 })();
 

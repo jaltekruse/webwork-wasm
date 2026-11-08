@@ -8,9 +8,22 @@
 #   index.html etc.         The demo front end (from pg-wasm/web)
 #   problems/               Sample problems
 #
-# Usage: pg-wasm/build.sh [--skip-perl] [--reconfig]
-#   --skip-perl   Don't rebuild Perl (reuse dist/emperl.*)
-#   --reconfig    Passed to webperl/build/build.sh (fresh Perl configure)
+#   opl/                    The Open Problem Library (with --opl)
+#   pg-wasm-config.json     Where problem library files are loaded from
+#
+# Usage: pg-wasm/build.sh [OPTIONS]
+#   --skip-perl     Don't rebuild Perl (reuse dist/emperl.*)
+#   --reconfig      Passed to webperl/build/build.sh (fresh Perl configure)
+#   --opl           Include the Open Problem Library's OpenProblemLibrary
+#                   directory (~300 MB) in dist/opl, for offline use, and
+#                   build a browsable index of it
+#   --opl-contrib   Also include the OPL's Contrib directory (~1.1 GB)
+#   --opl-remote    Don't copy the OPL, but still build the index (problems are
+#                   loaded from GitHub, so this needs an internet connection)
+#
+# Without --opl, problems from the library ("Library/..." and "Contrib/...")
+# are loaded from GitHub on demand. The OPL is cloned into work/opl, or set
+# OPL_DIR to an existing clone of webwork-open-problem-library.
 #
 # Requirements: everything webperl/build/build.sh needs (Emscripten SDK, node,
 # curl, make, a C compiler, perl), plus npm and python3.
@@ -24,11 +37,15 @@ PG="$ROOT/pg"
 DIST="$HERE/dist"
 WORK="$ROOT/work"
 
-SKIP_PERL=0; WEBPERL_ARGS=()
+SKIP_PERL=0; WEBPERL_ARGS=(); OPL=none; OPL_CONTRIB=0
+OPL_GITHUB="https://raw.githubusercontent.com/openwebwork/webwork-open-problem-library/main"
 for arg in "$@"; do
 	case "$arg" in
 		--skip-perl) SKIP_PERL=1 ;;
 		--reconfig)  WEBPERL_ARGS+=(--reconfig) ;;
+		--opl)          OPL=copy ;;
+		--opl-contrib)  OPL=copy; OPL_CONTRIB=1 ;;
+		--opl-remote)   OPL=remote ;;
 		*) echo "Unknown option $arg" >&2; exit 1 ;;
 	esac
 done
@@ -132,6 +149,38 @@ rm -rf "$DIST/problems"; cp -r "$HERE/problems" "$DIST/problems"
 # PG's documented sample problems (pg/tutorial/sample-problems)
 cp -r "$PG/tutorial/sample-problems" "$DIST/problems/sample-problems"
 node "$HERE/tools/problem-index.js" "$DIST/problems" > "$DIST/problems/index.json"
+
+# ##### Problem library #####
+
+rm -rf "$DIST/opl"
+LIB_URL="$OPL_GITHUB/OpenProblemLibrary/"; CONTRIB_URL="$OPL_GITHUB/Contrib/"; INDEX=null
+if [ "$OPL" != none ]; then
+	if [ -z "${OPL_DIR:-}" ]; then
+		OPL_DIR="$WORK/opl"
+		if [ ! -d "$OPL_DIR/OpenProblemLibrary" ]; then
+			say "Cloning the Open Problem Library into $OPL_DIR (about 2 GB)"
+			git clone --depth 1 https://github.com/openwebwork/webwork-open-problem-library.git "$OPL_DIR"
+		fi
+	fi
+	[ -d "$OPL_DIR/OpenProblemLibrary" ] || { echo "No OpenProblemLibrary directory in $OPL_DIR" >&2; exit 1; }
+	mkdir -p "$DIST/opl"
+	INDEX_ROOTS=("Library=$OPL_DIR/OpenProblemLibrary")
+	if [ "$OPL" = copy ]; then
+		say "Copying the OPL into dist/opl"
+		cp -r "$OPL_DIR/OpenProblemLibrary" "$DIST/opl/"
+		LIB_URL="opl/OpenProblemLibrary/"
+		if [ "$OPL_CONTRIB" = 1 ]; then
+			cp -r "$OPL_DIR/Contrib" "$DIST/opl/"
+			CONTRIB_URL="opl/Contrib/"
+			INDEX_ROOTS+=("Contrib=$OPL_DIR/Contrib")
+		fi
+	fi
+	say "Indexing the problem library"
+	node "$HERE/tools/opl-index.js" "$DIST/opl/index.json" "${INDEX_ROOTS[@]}"
+	INDEX='"opl/index.json"'
+fi
+printf '{\n\t"mounts": { "Library/": "%s", "Contrib/": "%s", "problems/": "problems/" },\n\t"libraryIndex": %s\n}\n' \
+	"$LIB_URL" "$CONTRIB_URL" "$INDEX" >"$DIST/pg-wasm-config.json"
 
 node "$HERE/tools/make-precache.js" "$DIST"
 

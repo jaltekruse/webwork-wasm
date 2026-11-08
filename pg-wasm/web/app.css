@@ -43,3 +43,8 @@ body { display: flex; flex-direction: column; background: var(--bs-body-bg); }
 	.app-main { grid-template-columns: minmax(0, 1fr); }
 	#source { min-height: 14rem; }
 }
+
+.nav-sm .nav-link { padding: .25rem .75rem; font-size: .875rem; }
+.library-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.library-grid .lib-problems { grid-column: 1 / -1; font-size: .8rem; }
+@media (max-width: 600px) { .library-grid { grid-template-columns: minmax(0, 1fr); } }

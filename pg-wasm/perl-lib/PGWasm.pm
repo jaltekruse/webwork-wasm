@@ -24,7 +24,6 @@ use lib "$ENV{PG_ROOT}/lib";
 
 use Cpanel::JSON::XS ();
 use Scalar::Util ();
-use MIME::Base64 ();
 use WeBWorK::PG;
 
 our $VERSION = '0.1';
@@ -41,21 +40,26 @@ my @FLAG_KEYS = qw(
 	comment showHintLimit error_flag
 );
 
-our $TEMP_DIR = '/tmp/pg';
+our $TEMP_DIR     = '/tmp/pg';
+our $TEMPLATE_DIR = '/opt/templates/';
 mkdir $TEMP_DIR unless -d $TEMP_DIR;
+mkdir $TEMPLATE_DIR unless -d $TEMPLATE_DIR;
 
 sub _clear_dir {
 	my ($dir) = @_;
 	opendir(my $dh, $dir) or return;
 	for my $f (grep { !/^\.\.?$/ } readdir $dh) {
 		my $p = "$dir/$f";
-		if (-d $p) { _clear_dir($p); rmdir $p } else { unlink $p }
+		if (-d $p && !-l $p) { _clear_dir($p); rmdir $p } else { unlink $p }
 	}
 	closedir $dh;
 	return;
 }
 
-# Returns { relative path => base64 content } for the files under $dir.
+# Returns { relative path => { path => ..., link => ... } } for the files
+# under $dir. "link" is set for symbolic links (PG links problem images, e.g.
+# from the OPL, into the temp directory), so the front end can load them from
+# their original location.
 sub _collect_files {
 	my ($dir, $prefix, $out) = @_;
 	$prefix //= '';
@@ -63,14 +67,30 @@ sub _collect_files {
 	opendir(my $dh, $dir) or return $out;
 	for my $f (grep { !/^\.\.?$/ } readdir $dh) {
 		my $p = "$dir/$f";
-		if (-d $p) { _collect_files($p, "$prefix$f/", $out) }
-		elsif (open my $fh, '<:raw', $p) {
-			local $/;
-			$out->{"$prefix$f"} = MIME::Base64::encode_base64(scalar <$fh>, '');
+		if (-d $p && !-l $p) { _collect_files($p, "$prefix$f/", $out) }
+		elsif (-l $p) { $out->{"$prefix$f"} = { path => $p, link => readlink($p) } }
+		elsif (-f $p) {
+			_recompress_png($p) if $p =~ /\.png$/i;
+			$out->{"$prefix$f"} = { path => $p };
 		}
 	}
 	closedir $dh;
 	return $out;
+}
+
+# PNG files written by the pure-Perl GD are stored uncompressed (see GD.pm).
+sub _recompress_png {
+	my ($path) = @_;
+	return unless defined &GD::recompress_png;
+	open(my $in, '<:raw', $path) or return;
+	my $png = do { local $/; <$in> };
+	close $in;
+	my $small = eval { GD::recompress_png($png) };
+	return unless defined $small && length $small < length $png;
+	open(my $out, '>:raw', $path) or return;
+	print $out $small;
+	close $out;
+	return;
 }
 
 my $json = Cpanel::JSON::XS->new->utf8->canonical->allow_nonref->allow_blessed->convert_blessed;
@@ -86,14 +106,16 @@ sub render {
 	my ($request) = @_;
 	my %req = %{$request // {}};
 
-	my $source = $req{source} // '';
+	# The problem is given either as source code, or as a file path relative to
+	# the templates directory (e.g. "Library/Rochester/setDerivatives1/s2_1_3.pg").
+	my $source = $req{source};
 	my $inputs = $req{inputs} // {};
 	my $submitted = $req{processAnswers} // (%$inputs ? 1 : 0);
 
 	my %options = (
-		r_source           => \$source,
+		(defined $source ? (r_source => \$source) : ()),
 		sourceFilePath     => $req{sourceFilePath} // '',
-		templateDirectory  => $req{templateDirectory} // '',
+		templateDirectory  => $req{templateDirectory} // $TEMPLATE_DIR,
 		displayMode        => $req{displayMode} // 'MathJax',
 		problemSeed        => $req{problemSeed} // 1234,
 		problemUUID        => $req{problemUUID} // 0,

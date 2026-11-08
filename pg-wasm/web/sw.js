@@ -21,16 +21,28 @@ self.addEventListener('activate', (event) => {
 		const manifest = await (await fetch('precache-manifest.json', { cache: 'no-store' })).json().catch(() => null);
 		if (manifest) {
 			for (const key of await caches.keys())
-				if (key.startsWith(PREFIX) && key !== PREFIX + manifest.version) await caches.delete(key);
+				if (key.startsWith(PREFIX) && key !== PREFIX + manifest.version && key !== RUNTIME_CACHE) await caches.delete(key);
 		}
 		await self.clients.claim();
 	})());
 });
 
+// Problem library files (local copy or GitHub) are cached when first used, so
+// problems that have been opened once also work offline.
+const RUNTIME_CACHE = PREFIX + 'library';
+const isLibraryFile = (url) =>
+	url.pathname.includes('/opl/') || url.hostname === 'raw.githubusercontent.com';
+
 self.addEventListener('fetch', (event) => {
 	if (event.request.method !== 'GET') return;
 	event.respondWith((async () => {
 		const cached = await caches.match(event.request, { ignoreSearch: true });
-		return cached || fetch(event.request);
+		if (cached) return cached;
+		const response = await fetch(event.request);
+		if (response.ok && isLibraryFile(new URL(event.request.url))) {
+			const cache = await caches.open(RUNTIME_CACHE);
+			cache.put(event.request, response.clone());
+		}
+		return response;
 	})());
 });
