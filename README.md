@@ -6,9 +6,12 @@ compiled to WebAssembly with [WebPerl](https://github.com/haukex/webperl).
 After the first visit it also works offline.
 
 - **PG is unmodified.** `pg/` is the upstream
-  [openwebwork/pg](https://github.com/openwebwork/pg) repository. The only
-  substitutions are small stand-ins for three CPAN modules that can't work in a
-  browser (`GD`, `DBI`, `YAML::XS`, see `pg-wasm/perl-lib/`).
+  [openwebwork/pg](https://github.com/openwebwork/pg) repository. Modules that
+  can't work in a browser are replaced in `pg-wasm/perl-lib/`: a pure-Perl `GD`
+  (for legacy graphs), and small stand-ins for `DBI` and `YAML::XS`.
+- **The Open Problem Library works**, including problem images, legacy GD
+  graphs and TikZ pictures. Problem files are loaded on demand, from a copy of
+  the OPL bundled with the site (offline) or from GitHub.
 - **WebPerl was updated** for current Emscripten and Perl 5.40.3 (`webperl/`,
   branch `claude/gracious-fermi-oy6dr4` of jaltekruse/webperl). It no longer
   needs a fork of Perl.
@@ -23,14 +26,17 @@ After the first visit it also works offline.
 | `pg/` | Submodule: upstream PG (problem renderer, macros, client-side JS) |
 | `pg-wasm/build.sh` | Builds everything into `pg-wasm/dist/` |
 | `pg-wasm/perl-lib/PGWasm.pm` | Perl side of the bridge: JSON request → `WeBWorK::PG` → JSON result |
-| `pg-wasm/perl-lib/{GD,DBI,YAML/XS}.pm` | Stand-ins for modules that can't run in a browser |
+| `pg-wasm/perl-lib/GD.pm` | Pure-Perl implementation of the GD graphics API PG uses (with libgd's bitmap fonts in `GD/Fonts.pm`) |
+| `pg-wasm/perl-lib/{DBI,YAML/XS}.pm` | Stand-ins for modules that can't run in a browser |
+| `pg-wasm/pg_config.yml` | PG configuration for the browser (paths in the virtual file system) |
 | `pg-wasm/web/pg-engine.js` | Boots Perl + PG (in a Worker or node), renders problems |
 | `pg-wasm/web/pg-worker.js` | Web Worker that hosts the engine |
 | `pg-wasm/web/pg-client.js` | Page-side API: `render()`, and builds the problem page for an iframe |
 | `pg-wasm/web/index.html`, `app.js` | Demo: problem editor + rendered problem |
 | `pg-wasm/web/sw.js` | Service worker: caches the whole app for offline use |
 | `pg-wasm/problems/` | Extra sample problems (PG's own `tutorial/sample-problems` are included too) |
-| `pg-wasm/test/` | Node test (renders all sample problems) and Playwright browser test |
+| `pg-wasm/tools/opl-index.js` | Builds the problem library index (subject → chapter → section) |
+| `pg-wasm/test/` | Node test (sample problems, random OPL samples) and Playwright browser test |
 
 ## Building
 
@@ -51,6 +57,18 @@ modules, builds a native host miniperl, then cross-compiles Perl. Later builds
 reuse that work; `pg-wasm/build.sh --skip-perl` only repackages PG and the
 front end.
 
+To include the Open Problem Library for offline use (adds about 300 MB):
+
+```bash
+pg-wasm/build.sh --opl            # clones the OPL into work/opl, or set OPL_DIR to a clone
+```
+
+Without `--opl`, problems from the library are loaded from GitHub
+(raw.githubusercontent.com) on demand, which needs an internet connection, and
+the library browser isn't available (problems can still be opened by path).
+`--opl-remote` builds the browsable index but still loads problems from GitHub,
+and `--opl-contrib` also bundles the OPL's Contrib directory (1.1 GB).
+
 Try it:
 
 ```bash
@@ -66,6 +84,7 @@ Tests:
 ```bash
 cd pg-wasm
 node test/node-render.test.js --all   # renders all ~170 sample problems in node
+OPL_DIR=../work/opl node test/node-render.test.js --opl=1000   # 1000 random OPL problems
 node test/browser.test.js             # Chromium via Playwright, writes test/screenshots/
 ```
 
@@ -95,6 +114,18 @@ The request options (`problemSeed`, `inputs`, `showHints`, `showSolutions`,
 `showCorrectAnswers`, `language`, ...) map onto `WeBWorK::PG->new` options; see
 `pg-wasm/perl-lib/PGWasm.pm`.
 
+Instead of `source`, a request can give `sourceFilePath`, a path in the
+templates directory such as `Library/Rochester/setDerivatives1/c1s5p8.pg`. With
+`source`, `sourceFilePath` tells PG where to find the problem's images. Other
+locations can be mounted, and files can be written (e.g. a problem and its
+images that a user opened):
+
+```js
+await pg.mount('mybook/', 'https://example.org/my-problems/');  // templates/mybook/... loads from that URL
+await pg.writeFiles('local/', { 'p.pg': sourceText, 'pic.png': arrayBuffer });
+await pg.render({ sourceFilePath: 'local/p.pg' });
+```
+
 ## How it works
 
 1. **Perl in WebAssembly.** `webperl/build/build.sh` downloads Perl 5.40.3,
@@ -115,7 +146,25 @@ The request options (`problemSeed`, `inputs`, `showHints`, `showSolutions`,
    saved memory. This is the in-browser version of the renderer forking a
    new process per request: no state leaks from one problem to the next, and
    a crash during one render doesn't affect the next.
-5. **Display.** The result is shown as a full HTML page in an iframe (like
+5. **Problem files on demand.** `/opt/templates` is a webwork2-style course
+   templates directory, where `Library/` (the OPL), `Contrib/` and `problems/`
+   are mounted from URLs (see `dist/pg-wasm-config.json`). When PG looks for a
+   file there (a problem, an included problem, a macro, an image), the worker
+   fetches it synchronously, which workers are allowed to do, and saves it in
+   the in-memory file system. Images that PG links into its temp directory are
+   shown from their original URL.
+6. **Graphs and pictures.**
+   - Legacy WWPlot/`init_graph` graphs (about 6% of the OPL) are drawn by
+     `perl-lib/GD.pm`, a pure-Perl implementation of the GD calls PG uses,
+     which produces the same PNGs as libgd.
+   - TikZ and LaTeX images (`createTikZImage`, `createLaTeXImage`, and the
+     `Plots` macros' TikZ output): `PGWasm.pm` replaces `LaTeXImage::draw`,
+     so instead of running latex, the image holds a description of the LaTeX
+     document. The page compiles it to SVG with
+     [TikZJax](https://github.com/drgrice1/tikzjax) (TeX compiled to
+     WebAssembly, by Jim Fowler and Glenn Rice). The SVGs are cached in the
+     browser, so a picture is only compiled once.
+7. **Display.** The result is shown as a full HTML page in an iframe (like
    the PG renderer's iframe mode), with Bootstrap, MathJax and PG's own
    JavaScript (MathQuill, feedback popovers, graph tools, drag and drop).
    Form submissions are sent to the parent page via `postMessage`, and the
@@ -123,22 +172,31 @@ The request options (`problemSeed`, `inputs`, `showHints`, `showSolutions`,
 
 ## Status and limitations
 
-- 151 of PG's 166 sample problems render with no errors or warnings. The others:
-  - **TikZ/LaTeX images** (`createTikZImage`, `createLaTeXImage`; 13 samples)
-    need a TeX installation. These problems render, but the image is missing.
-    Problems using the `Plots` macros (JSXGraph) work. A possible next step is
-    a WebAssembly TeX engine (e.g. TikZJax/SwiftLaTeX).
-  - **Legacy GD graphs** (`init_graph`/WWPlot; 1 sample) need libgd. A
-    possible next step is a pure-Perl GD replacement that draws PNG/SVG.
-  - **Sage cells** (`AskSage`) need a Sage server and network access.
-- Images that live next to a problem file (e.g. OPL problems with
-  `image("foo.png")`) aren't provided to the renderer yet.
+- **PG's 166 sample problems:** all render. Two show a message instead of one
+  of their pictures: one needs a LaTeX package TikZJax doesn't have (xy-pic),
+  and `AskSage` needs a Sage server.
+- **OPL:** in a random sample of 1,000 OPL problems, 981 render with no errors
+  or warnings. The 19 others also fail with native Perl and the same PG: they
+  use old applets, call macros with missing options, or use Rserve.
+- **TikZ/LaTeX pictures** compile in about 2–5 s the first time (in the
+  background, while the rest of the problem is already shown), and are
+  instant after that. Only the LaTeX packages TikZJax includes can be used
+  (amsmath/amssymb, array, etoolbox, pgfplots, tikz-cd, tikz-3dplot, xparse,
+  and all TikZ libraries). For others, a message is shown in place of the
+  picture.
+- Some OPL problems need course-specific macro files that aren't in the OPL or
+  PG (e.g. 39 Portland CC problems load `ORCCA.pl`). They fail on any WeBWorK
+  server without that file. Such files can be added to `/opt/templates/macros`
+  with `pg.writeFiles('macros/', ...)` or by mounting `macros/`.
 - `images` display mode (dvipng) is not available. MathJax mode is used.
 - Infinite loops in a problem are stopped by terminating the worker after
   30 s (`PGClient` `timeout` option). The worker then restarts.
 - Offline use needs the page to be served over http(s) once, so the service
   worker can cache it. `file://` URLs don't support Web Workers or WebAssembly
-  fetches in most browsers.
-- Download size: about 23 MB uncompressed (`emperl.wasm` 4.5 MB,
-  `emperl.data` 14 MB, `pg.data` 3.9 MB), less with gzip/brotli on the server.
-  `emperl.data` could be trimmed further, e.g. unused parts of `unicore` and Mojolicious.
+  fetches in most browsers. Problems from the library are cached as they're
+  used; with `--opl` the whole library is on the same server, so it can be
+  used on a local network without internet.
+- Download size: about 30 MB uncompressed before any problems are loaded
+  (`emperl.wasm` 4.5 MB, `emperl.data` 14 MB, `pg.data` 3.9 MB, TikZJax 7 MB,
+  loaded only when a problem has a TikZ picture), less with gzip/brotli on the
+  server.

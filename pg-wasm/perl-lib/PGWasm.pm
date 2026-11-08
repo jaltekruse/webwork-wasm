@@ -95,6 +95,34 @@ sub _recompress_png {
 
 my $json = Cpanel::JSON::XS->new->utf8->canonical->allow_nonref->allow_blessed->convert_blessed;
 
+# ##### TikZ and LaTeX images #####
+#
+# PG's LaTeXImage (used by createTikZImage, createLaTeXImage, and the Plots
+# macros' TikZ output) runs latex and dvisvgm to make an image. Those programs
+# don't exist here, so instead the image "file" holds a description of the
+# LaTeX document (marked by $LATEX_MARKER). The front end compiles it to SVG
+# in the browser with TikZJax (a WebAssembly build of TeX).
+our $LATEX_MARKER = "%PGWASM-LATEX%\n";
+require LaTeXImage;
+# Created here, because draw() runs inside PG's Safe compartment, where class
+# names can't be looked up (methods of existing objects work).
+my $latex_json = Cpanel::JSON::XS->new->utf8->canonical;
+{
+	no warnings 'redefine';
+	*LaTeXImage::draw = sub {
+		my $self = shift;
+		my $env  = $self->environment;
+		return $LATEX_MARKER . $latex_json->encode({
+			environment   => [ map { $_ // '' } @$env[ 0, 1 ] ],
+			tex           => $self->tex // '',
+			texPackages   => [ map { ref $_ eq 'ARRAY' ? [ map { $_ // '' } @$_ ] : [$_] } @{ $self->texPackages // [] } ],
+			tikzLibraries => $self->tikzLibraries // '',
+			addToPreamble => $self->addToPreamble // '',
+			ext           => $self->ext // 'svg',
+		});
+	};
+}
+
 sub _stringify {
 	my $v = shift;
 	return undef unless defined $v;

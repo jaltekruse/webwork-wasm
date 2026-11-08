@@ -88,6 +88,18 @@ const port = 8000 + Math.floor(Math.random() * 1000);
 			console.log(`${p}: rendered, ${errs} error box(es)`);
 		}
 
+		// TikZ image, compiled in the browser by TikZJax
+		await page.goto(`http://localhost:${port}/?problem=${encodeURIComponent('problems/sample-problems/ProblemTechniques/TikZImages.pg')}`);
+		await frame.locator('.pg-tikz').waitFor({ state: 'attached', timeout: 60000 });
+		await page.waitForFunction(() => {
+			const d = document.getElementById('problem-frame').contentDocument;
+			const t = d && d.querySelector('.pg-tikz');
+			// TikZJax shows an animated loader until TeX has finished.
+			return t && t.querySelector('svg') && !t.querySelector('script') && !t.innerHTML.includes('animate');
+		}, null, { timeout: 60000 });
+		await page.screenshot({ path: path.join(shots, '3-TikZImages.png') });
+		console.log('TikZ image compiled in the browser');
+
 		// Open Problem Library (when the build includes it, --opl)
 		if (fs.existsSync(path.join(dist, 'opl', 'index.json'))) {
 			const imagesLoaded = () => page.waitForFunction(() => {

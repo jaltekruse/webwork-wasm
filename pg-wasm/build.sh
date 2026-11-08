@@ -4,7 +4,7 @@
 #   emperl.js/.wasm/.data   Perl compiled to WebAssembly, with PG's CPAN deps
 #   pg.data, pg.data.js     The PG library and macros (mounted at /opt/pg)
 #   pg_files/               PG's client-side JavaScript/CSS (from pg/htdocs)
-#   vendor/                 Bootstrap and MathJax
+#   vendor/                 Bootstrap, MathJax and TikZJax
 #   index.html etc.         The demo front end (from pg-wasm/web)
 #   problems/               Sample problems
 #
@@ -141,6 +141,10 @@ cp "$HERE/node_modules/bootstrap/dist/css/bootstrap.min.css" "$HERE/node_modules
 rm -f "$DIST/vendor/mathjax/chtml.js"
 mkdir -p "$DIST/vendor/mathjax/output" && cp "$HERE/node_modules/mathjax/es5/output/chtml.js" "$DIST/vendor/mathjax/output/"
 
+# TikZJax (TeX compiled to WebAssembly) for TikZ/LaTeX images in problems
+mkdir -p "$DIST/vendor/tikzjax"
+( cd "$HERE/node_modules/@drgrice1/tikzjax/dist" && tar cf - --exclude='*.map' . ) | ( cd "$DIST/vendor/tikzjax" && tar xf - )
+
 # ##### Front end and sample problems #####
 
 say "Copying the front end"
@@ -179,8 +183,10 @@ if [ "$OPL" != none ]; then
 	node "$HERE/tools/opl-index.js" "$DIST/opl/index.json" "${INDEX_ROOTS[@]}"
 	INDEX='"opl/index.json"'
 fi
-printf '{\n\t"mounts": { "Library/": "%s", "Contrib/": "%s", "problems/": "problems/" },\n\t"libraryIndex": %s\n}\n' \
-	"$LIB_URL" "$CONTRIB_URL" "$INDEX" >"$DIST/pg-wasm-config.json"
+# LaTeX packages that TikZJax can load (others can't be used in TikZ/LaTeX images)
+TIKZ_PACKAGES="$(cd "$DIST/vendor/tikzjax/tex_files" && ls *.sty.gz | sed 's/\.sty\.gz$//' | sed 's/.*/"&"/' | paste -sd, -)"
+printf '{\n\t"mounts": { "Library/": "%s", "Contrib/": "%s", "problems/": "problems/" },\n\t"libraryIndex": %s,\n\t"tikzPackages": [%s]\n}\n' \
+	"$LIB_URL" "$CONTRIB_URL" "$INDEX" "$TIKZ_PACKAGES" >"$DIST/pg-wasm-config.json"
 
 node "$HERE/tools/make-precache.js" "$DIST"
 

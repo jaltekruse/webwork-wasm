@@ -10,7 +10,8 @@
 	},
 	"dependencies": {
 		"bootstrap": "5.3.3",
-		"mathjax": "3.2.2"
+		"mathjax": "3.2.2",
+		"@drgrice1/tikzjax": "1.0.0-beta24"
 	},
 	"devDependencies": {
 		"js-yaml": "4.1.0"

@@ -245,12 +245,29 @@
 		}
 
 		// Converts the files PG put in its temp directory into URLs for the page:
-		// links to fetched files use the original URL, other files become data URLs.
+		// links to fetched files use the original URL, other files become data URLs,
+		// and TikZ/LaTeX images become { latex: description } objects.
+		// TikZ/LaTeX images: PGWasm.pm replaces the image by a description of the
+		// LaTeX document, which the page compiles with TikZJax (see pg-client.js).
+		readLatexImage(path) {
+			const marker = '%PGWASM-LATEX%\n';
+			try {
+				const data = this.Module.FS.readFile(path);
+				if (data.length < marker.length || new TextDecoder().decode(data.subarray(0, marker.length)) !== marker)
+					return null;
+				return JSON.parse(new TextDecoder().decode(data.subarray(marker.length)));
+			} catch (e) {
+				return null;
+			}
+		}
+
 		resolveFiles(files) {
 			const urls = {};
+			let latex;
 			for (const [name, info] of Object.entries(files)) {
 				const target = info.link ? normalizePath(info.link.startsWith('/') ? info.link : TEMP_DIR + info.link) : null;
 				if (target && this.fetched.has(target)) urls[name] = this.fetched.get(target);
+				else if (!target && (latex = this.readLatexImage(info.path))) urls[name] = { latex };
 				else {
 					try {
 						urls[name] = `data:${mimeType(name)};base64,${toBase64(this.Module.FS.readFile(target ?? info.path))}`;

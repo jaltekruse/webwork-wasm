@@ -17,6 +17,38 @@
 	const escapeHTML = (s) =>
 		String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+	const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+	// A TikZJax script element for a LaTeX image (see PGWasm.pm), replacing the
+	// <img> element PG made for it, and keeping its size.
+	const debugTikz = typeof location !== 'undefined' && /[?&]debugTikz/.test(location.search);
+	const tikzElement = (spec, imgTag, available) => {
+		const attr = (name) => (imgTag.match(new RegExp(`\\b${name}="([^"]*)"`)) || [])[1];
+		const packages = {};
+		for (const [pkg, options] of spec.texPackages ?? []) {
+			if (pkg !== 'tikz' && pkg !== 'xcolor') packages[pkg] = options ?? '';
+		}
+		// TeX would stop with an error for a package TikZJax doesn't have.
+		const missing = available ? Object.keys(packages).filter((p) => !available.includes(p)) : [];
+		if (missing.length)
+			return `<span class="pg-tikz-error alert alert-warning d-inline-block p-2 small">This image can't be ` +
+				`generated in the browser: it needs the LaTeX package${missing.length > 1 ? 's' : ''} ` +
+				`${missing.map(escapeHTML).join(', ')}.</span>`;
+		const [env, envOptions] = spec.environment ?? ['', ''];
+		const tex = env
+			? `\\begin{${env}}${envOptions ? `[${envOptions}]` : ''}\n${spec.tex}\n\\end{${env}}`
+			: spec.tex;
+		const width = attr('width'), height = attr('height');
+		const size = [width ? `width:${width}px` : '', height && !width ? `height:${height}px` : ''].filter(Boolean).join(';');
+		return `<span class="pg-tikz${width ? ' pg-tikz-sized' : ''}" style="display:inline-block;vertical-align:middle;${size}">` +
+			`<script type="text/tikz" data-tex-packages="${escapeHTML(JSON.stringify(packages))}"` +
+			` data-tikz-libraries="${escapeHTML(spec.tikzLibraries ?? '')}"` +
+			` data-add-to-preamble="${escapeHTML(spec.addToPreamble ?? '')}"` +
+			` data-aria-label="${escapeHTML(attr('alt') ?? attr('aria-label') ?? '')}"` +
+			`${debugTikz ? " data-show-console=\"true\"" : ""} data-width="${escapeHTML(width ?? '100')}" data-height="${escapeHTML(height ?? width ?? '100')}">` +
+			tex.replace(/<\/script/gi, '<\\/script') + '</script></span>';
+	};
+
 	class PGClient {
 		constructor(options = {}) {
 			this.baseURL = new URL(options.baseURL ?? './', global.location.href).href;
@@ -155,11 +187,26 @@
 
 			// Files that PG put in its temp directory (problem images, generated
 			// graphs) are given as URLs (the original file's URL, or a data URL).
+			// TikZ/LaTeX images are compiled in the page by TikZJax.
 			let body = result.body_text ?? '';
 			let head = (result.head_text ?? '') + (result.post_header_text ?? '');
+			let usesTikz = false;
 			for (const [name, url] of Object.entries(result.files ?? {})) {
+				if (url && typeof url === 'object') {
+					if (!url.latex) continue;
+					const img = new RegExp(`<img\\b[^>]*\\bsrc="pg_temp/${escapeRegExp(name)}"[^>]*>`, 'g');
+					body = body.replace(img, (tag) => {
+						usesTikz = true;
+						return tikzElement(url.latex, tag, this.config?.tikzPackages);
+					});
+					continue;
+				}
 				body = body.split('pg_temp/' + name).join(url);
 				head = head.split('pg_temp/' + name).join(url);
+			}
+			if (usesTikz) {
+				css.push(this.baseURL + 'vendor/tikzjax/fonts.css');
+				js.push(`<script src="${this.baseURL}vendor/tikzjax/tikzjax.js"></script>`);
 			}
 
 			let summary = '';
@@ -181,7 +228,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <base href="${escapeHTML(this.baseURL)}">
 ${css.map((href) => `<link rel="stylesheet" href="${escapeHTML(href)}">`).join('\n')}
-<style>body{padding:.5rem;background:transparent} .problem-content{margin-bottom:1rem}</style>
+<style>body{padding:.5rem;background:transparent} .problem-content{margin-bottom:1rem}
+.pg-tikz svg{overflow:hidden;max-width:100%} .pg-tikz-sized svg{width:100%;height:auto}</style>
 <script>${MATHJAX_CONFIG}</script>
 <script src="${this.baseURL}vendor/mathjax/tex-chtml.js" id="MathJax-script" defer></script>
 <script src="${this.baseURL}vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
