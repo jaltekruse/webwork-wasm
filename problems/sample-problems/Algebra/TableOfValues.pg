@@ -1,0 +1,61 @@
+## DESCRIPTION
+## Function table of values
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('algebra', 'function table of values')
+
+#:% name = Table of Values
+#:% type = Sample
+#:% subject = [algebra, precalculus]
+#:% categories = [table]
+
+#:% section = preamble
+#: The PODLINK('niceTables.pl') macro is implicitly used in this problem, but is
+#: automatically loaded by the `PGML.pl` macro.
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: Create the array `@answer` filled with values via a map.
+$f = Formula('3^(-x)');
+
+@answer = map { $f->eval(x => $_) } 0 .. 2;
+
+#:% section = statement
+#: Create a PODLINK('niceTables.pl') `DataTable` via the PGML syntax. The first
+#: row is declared to be a row of headers by adding the `headerrow => 1` option
+#: to any cell in that row. Note that this option applies to the entire row. The
+#: `horizontalrules` and `texalignment`options add borders around each of the
+#: cells. The option `padding => [0.5, 0.5]` adds a bit more vertical space in
+#: each cell to improve the appearance. The option `valign => 'middle'` gives
+#: better vertical alignment for this table.
+BEGIN_PGML
+If [`f(x) = [$f]`], fill in the table of values with numbers.
+
+[#
+	[.[`x`].] [.[`f(x)`].]*{ headerrow => 1 }
+	[.[`0`].] [.[_]{$answer[0]}.]*
+	[.[`1`].] [.[_]{$answer[1]}.]*
+	[.[`2`].] [.[_]{$answer[2]}.]*
+#]{
+	horizontalrules => 1,
+   	texalignment    => '|c|c|',
+   	padding         => [ 0.5, 0.5 ],
+	valign          => 'middle'
+}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

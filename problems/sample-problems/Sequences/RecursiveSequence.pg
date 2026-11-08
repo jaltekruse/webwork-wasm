@@ -1,0 +1,57 @@
+## DESCRIPTION
+## Integral calculus: sequences and recursively defined functions
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## Static(1)
+## MO(1)
+## KEYWORDS('integral calculus', 'recursively defined functions')
+
+#:% name = Recursive Sequence
+#:% type = Sample
+#:% subject = Sequences and Series
+#:% categories = [sequences]
+
+#:% section = preamble
+#: A new named function will be defined and added to the context. This can be
+#: done using PODLINK('parserFunction.pl').
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'parserFunction.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: Define a new named function `f` as something the student is unlikely to
+#: guess. The named function `f` is just a placeholder since the student will
+#: enter expressions involving `f(n - 1)`. It will be interpreted internally as
+#: defined here, and the only thing the student sees is `f(n - 1)`.
+#:
+#: If the recursion has a closed-form solution (e.g., the Fibonacci numbers are
+#: given by `f(n) = (a^n - (1 - a)^n) / sqrt(5)` where `a = (1 + sqrt(5)) / 2`)
+#: and you want to allow students to enter the closed-form solution, it would be
+#: good to define `f` using that explicit solution in case the student tries to
+#: answer the question by entering the explicit solution.
+Context()->variables->are(n => 'Real');
+parserFunction(f => 'sin(pi^n) + e * n^2');
+
+$fn = Formula('3 f(n - 1) + 2');
+
+#:% section = statement
+BEGIN_PGML
+If [`f(n)`] defines a sequence for all integegers [`n \geq 0`] that satisfies
+the property that [`f(n)`] is two more than three times the previous value.
+Find a recursive definition for [`f(n)`].
+
+[`f(n) =`] [_]{$fn}{15}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

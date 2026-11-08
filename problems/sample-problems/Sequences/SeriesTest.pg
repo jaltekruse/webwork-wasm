@@ -1,0 +1,171 @@
+## DESCRIPTION
+## Series: limit comparison test
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('integral calculus', 'limit comparison test')
+
+#:% name = Series Test
+#:% type = Sample
+#:% subject = Sequences and Series
+#:% categories = [sequences, series]
+
+#:% section = preamble
+#: The PODLINK('parserMultiAnswer.pl') macro is used for the fraction answer so
+#: that the numerator and denominator can be checked together.
+#:
+#: The PODLINK('parserRadioMultiAnswer.pl') macro is used for a better way for
+#: students to enter an answer that might not exist than telling students to
+#: enter DNE.
+#:
+#: The PODLINK('niceTables.pl') macro which is loaded by the `PGML.pl` macro is
+#: used to create a table in which answer blanks are stacked on top of each
+#: other to form a fraction.
+#:
+#: The PODLINK('PGgraders.pl') macro is used to give incremental partial credit
+#: (although that is a poor choice for this problem).
+DOCUMENT();
+
+loadMacros(
+    'PGstandard.pl',        'PGML.pl',
+    'parserPopUp.pl',       'PGgraders.pl',
+    'parserMultiAnswer.pl', 'parserRadioMultiAnswer.pl',
+    'PGcourse.pl'
+);
+
+#:% section = setup
+#: Create `$multians` as a `MultiAnswer` with the two answers `$num1` and
+#: `$den1`. An alternate form of the correct answer is `$num2 / $den2`. This
+#: alternate form is also checked for in the `MultiAnswer` checker.
+#:
+#: The value of the limit in the limit comparison test is created as a
+#: `RadioMultiAnswer`. This allows a clear way for students to enter a
+#: non-existent limit, and is better than telling students to enter DNE and
+#: results in the invalid statement `lim ... = DNE`.
+#:
+#: Also create a drop down answer for asking about convergence of the series.
+Context()->variables->are(n => 'Real');
+
+$a = random(2, 9);
+$b = random(2, 9);
+$c = random(5, 20);
+$d = random(3, 9);
+$e = random(2, 9);
+
+$num1 = Formula("$a n^$d + $b n^" . ($d - 1));
+$den1 = Formula("$c n^$d + $e");
+
+# Alternate form of the correct answer
+$num2 = Formula("$a + $b / n");
+$den2 = Formula("$c + $e / (n^$d)");
+
+$multians = MultiAnswer($num1, $den1)->with(
+    singleResult => 0,
+    checker      => sub {
+        my ($correct, $student, $ansHash) = @_;
+        my ($stu1, $stu2) = @{$student};
+
+        if (($num1 == $stu1 && $den1 == $stu2)
+            || ($num2 == $stu1 && $den2 == $stu2))
+        {
+            return [ 1, 1 ];
+        } elsif (($num1 == $stu1 && $den2 == $stu2)
+            || ($num2 == $stu1 && $den1 == $stu2))
+        {
+            $ansHash->setMessage(1, "Check your algebra");
+            $ansHash->setMessage(2, "Check your algebra");
+            return [ 0, 0 ];
+        } elsif ($num1 == $stu1 || $num2 == $stu1) {
+            return [ 1, 0 ];
+        } elsif ($den1 == $stu2 || $den2 == $stu2) {
+            return [ 0, 1 ];
+        } else {
+            return [ 0, 0 ];
+        }
+    }
+);
+
+$limitRMA = RadioMultiAnswer(
+    [
+        [
+            '\(\displaystyle\lim_{n \to \infty}\frac{a_n}{b_n} =\) %s',
+            Formula("$a / $c")
+        ],
+        ['The limit does not exist, and is not infinite.']
+    ],
+    0
+);
+
+$popup = DropDown([ 'Converges', 'Diverges', 'Inconclusive' ], 'Converges');
+
+#:% section = statement
+#: Display the answer rules nicely as a fraction in HTML and TeX modes by using
+#: the `PGML` syntax for a `LayoutTable` from PODLINK('niceTables.pl').
+BEGIN_PGML
+Use the limit comparison test to determine whether
+[``\sum_{n = [$c]}^{\infty} a_n
+	= \sum_{n = [$c]}^{\infty} \frac{[$a] n + [$b]}{[$c] n^{[$d]} + [$e]}``]
+converges or diverges.
+
+Choose a series [``\sum_{n = [$c]}^\infty b_n``] with terms of the form
+[``b_n = \frac{1}{n^p}``] to use in the limit comparison test.
+
+a. Simplify the fraction [``\frac{a_n}{b_n}``] in the application of the limit
+comparison test shown. Give your answer as a fully reduced fraction.
+[#
+	[.
+		For [`n \geq [$c]`],
+	   	[``\lim_{n \to \infty}\frac{a_n}{b_n} = \lim_{n \to \infty}``]
+	.]
+	[.
+		[#
+			[.[_]{$multians}{10}.]*{ bottom => 1 }
+			[.[_]{$multians}{10}.]
+		#]*{ padding => [ 0.5, 0 ] }
+	.]
+#]*{
+    center     => 0,
+    valign     => 'middle',
+    allcellcss => { padding => '4pt' }
+}
+
+b. Evaluate the limit in the previous part. Enter [|infinity|]* for [` \infty `]
+and [|-infinity|]* for [`-\infty`].
+
+    [_]{$limitRMA}{10}
+
+c. By the limit comparison test, does the series converge, diverge, or is the
+test inconclusive? [_]{$popup}
+END_PGML
+
+#:% section = answer
+#: The problem grader fluid is used to give partial credit incrementally.
+#:
+#: * 0% is awarded for 0-1 correct answers,
+#: * 40% is awarded for 2-3 correct answers, and
+#: * full credit is awarded for 4 correct answers.
+#:
+#: This is only here to demonstrate the usage of the fluid problem grader, and
+#: because that is how this problem has been. It would be better to use
+#: weights with the default `avg_problem_grader` for a problem like this. The
+#: parts of this problem are not equal, so the fluid problem grader is not a
+#: good choice.
+install_problem_grader(~~&custom_problem_grader_fluid);
+
+$ENV{grader_numright} = [ 2,   4 ];
+$ENV{grader_scores}   = [ 0.4, 1 ];
+$ENV{grader_message} =
+    'You can earn 40% partial credit for 2 - 3 correct answers.';
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

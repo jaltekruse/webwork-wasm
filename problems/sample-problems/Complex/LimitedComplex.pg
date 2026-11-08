@@ -1,0 +1,85 @@
+## DESCRIPTION
+## This shows the capabilities of the LimitedComplex context.
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(Problem Techniques)
+## Date(06/01/2023)
+## Institution(Fitchburg State University)
+## Author(Peter Staab)
+## MO(1)
+## KEYWORDS('complex','addition','subtraction','absolute value')
+
+#:% name = Complex Numbers, Limited Input
+#:% type = [technique]
+#:% subject = [complex]
+#:% categories = [complex variables]
+
+#:% section = preamble
+#: This problems shows the capabilities of the
+#: PODLINK('contextLimitedComplex.pl') macro, so it must be loaded.
+DOCUMENT();
+
+loadMacros(
+    'PGstandard.pl',            'PGML.pl',
+    'contextLimitedComplex.pl', 'PGcourse.pl'
+);
+
+#:% section = setup
+#: Often when students are asked to perform operations with complex numbers,
+#: usually it is not desirable for them to be able to enter those operations in
+#: their answer. One way to achieve this is by using the `LimitedComplex`
+#: context via `Context('LimitedComplex')`. This context will only allow a
+#: simplified complex number in either Cartesian or polar form to be entered.
+#: Note that Perl operations on complex numbers are still allowed, but
+#: operations in a string passed to the `Compute` call or in a student answer
+#: are not.
+#:
+#: If you only want complex numbers to be entered in Cartesian form you can use
+#: `Context('LimitedComplex-cartesian')` and if you only want students to
+#: enter numbers in polar form use `Context('LimitedComplex-polar')`.
+#:
+#: The final computation determines the polar form of the answer for use in the
+#: solution. In the `LimitedComplex` context, most functions are disabled, so
+#: the computations are performed on the real and imaginary components directly.
+Context('LimitedComplex');
+
+$x0 = non_zero_random(-5, 5);
+$y0 = non_zero_random(-5, 5);
+$x1 = non_zero_random(-5, 5);
+$y1 = non_zero_random(-5, 5);
+
+$z0 = Complex($x0, $y0);
+$z1 = Complex($x1, $y1);
+
+$ans1 = $z0 + $z1;
+$ans2 = $z0 * $z1;
+
+$arg0 = atan($y0 / $x0) + ($x0 > 0 ? ($y0 > 0 ? 0 : 2 * pi) : pi);
+$arg1 = atan($y1 / $x1) + ($x1 > 0 ? ($y1 > 0 ? 0 : 2 * pi) : pi);
+$abs0 = sqrt($x0**2 + $y0**2);
+$abs1 = sqrt($x1**2 + $y1**2);
+
+#:% section = statement
+BEGIN_PGML
+Let [`z_0 = [$z0]`] and [`z_1 = [$z1]`]. Find
+
+[`z_0 + z_1 =`] [___]{$ans1}
+
+[`z_0 z_1 =`] [___]{$ans2}
+
+Give the answers in simplified Cartesian or polar form.
+END_PGML
+
+#:% section = solution
+#: Note that a solution should do better than is demonstrated here.  Don't just
+#: give the answers.  Show how to find the answers.
+BEGIN_PGML_SOLUTION
+The first answer in Cartesian form is [`[$ans1]`].
+
+The second answer in polar form is
+[`[@ Round($abs0 * $abs1, 4) @] e^{[@ Round($arg0 + $arg1, 4) @]i}`].
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

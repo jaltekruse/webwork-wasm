@@ -1,0 +1,76 @@
+## DESCRIPTION
+## This problem gives the student a quadratic in factored form and asks for
+## the equivalent in expanded/general form.
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## Static(1)
+## MO(1)
+## KEYWORDS('algebra', 'expanded polynomial')
+
+#:% name = Expanded Polynomial
+#:% type = Sample
+#:% subject = [algebra, precalculus]
+#:% categories = [polynomials]
+
+#:% section = preamble
+#: Load the PODLINK('contextLimitedPolynomial.pl') macro.
+DOCUMENT();
+
+loadMacros(
+    'PGstandard.pl',               'PGML.pl',
+    'contextLimitedPolynomial.pl', 'PGcourse.pl'
+);
+
+#:% section = setup
+#: The PODLINK('contextLimitedPolynomial.pl') macro provides two contexts:
+#:
+#: ```{#contexts .perl}
+#: Context('LimitedPolynomial');
+#: Context('LimitedPolynomial-Strict');
+#: ```
+#: The strict version does not allow any mathematical operations within
+#: coefficients, so `(5+3)x` must be simplified to `8x`. For more details, see
+#: PODLINK('contextLimitedPolynomial.pl').
+#:
+#: Switch to the `LimitedPolynomial-Strict` context, construct the coefficients
+#: `$b` and `$c`, and then construct `$expandedform` using these coefficients.
+#: Note that the coefficients must be provided as simplified numeric values
+#: because the `LimitedPolynomial-Strict` context will not accept answers that
+#: are not already simplified completely. That is done here by computing those
+#: values in Perl before using them in the formula definition. Notice that the
+#: `reduce` method is called for the expanded form of the polynomial, which
+#: ensures that the polynomial will be displayed as `x^2 - 6x + 4` instead of
+#: `x^2 + -6x + 4`.
+Context('Numeric');
+$h          = 3;
+$k          = 5;
+$vertexform = Compute("(x-$h)^2-$k");
+
+# Expanded form
+Context('LimitedPolynomial-Strict');
+$b            = -2 * $h;
+$c            = $h**2 - $k;
+$expandedform = Formula("x^2 + $b x + $c")->reduce();
+
+#:% section = statement
+#: The example form `ax^2+bx+c` for the answer is given to help students
+#: understand how to format their answers.
+BEGIN_PGML
+The quadratic expression [`[$vertexform]`] is written in vertex form.
+Write the expression in expanded form [`ax^2 + bx + c`].
+
+[_]{$expandedform}{20}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

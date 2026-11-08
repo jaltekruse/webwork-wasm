@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PG in the Browser</title>
+	<meta name="description" content="Render and grade WeBWorK PG problems in the browser, with Perl compiled to WebAssembly.">
+	<link rel="manifest" href="manifest.webmanifest">
+	<link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet" href="app.css">
+</head>
+<body>
+	<header class="app-header">
+		<div class="container-fluid d-flex flex-wrap align-items-center gap-2">
+			<h1 class="h5 m-0 me-auto">PG in the Browser <small class="text-body-secondary fw-normal">WeBWorK problems, no server</small></h1>
+			<span id="status" class="badge text-bg-secondary" role="status" aria-live="polite">Loading...</span>
+		</div>
+	</header>
+
+	<main class="container-fluid app-main">
+		<section class="editor-pane" aria-label="Problem source">
+			<ul class="nav nav-tabs nav-sm mb-2" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="tab-examples" data-panel="panel-examples" type="button" role="tab" aria-selected="true">Examples</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="tab-library" data-panel="panel-library" type="button" role="tab" aria-selected="false">Problem library</button>
+				</li>
+				<li class="nav-item ms-auto">
+					<label for="file-input" class="btn btn-sm btn-outline-secondary mb-1" title="Open a .pg file, together with its image files">Open files...</label>
+					<input type="file" id="file-input" accept=".pg,.txt,.png,.gif,.jpg,.jpeg,.svg,.html,.pl" multiple class="visually-hidden">
+				</li>
+			</ul>
+			<div id="panel-examples" class="source-panel mb-2" role="tabpanel">
+				<label for="problem-select" class="visually-hidden">Example problem</label>
+				<select id="problem-select" class="form-select form-select-sm"></select>
+			</div>
+			<div id="panel-library" class="source-panel mb-2" role="tabpanel" hidden>
+				<div id="library-browser" class="library-grid mb-2" hidden>
+					<select id="lib-subject" class="form-select form-select-sm" aria-label="Subject"></select>
+					<select id="lib-chapter" class="form-select form-select-sm" aria-label="Chapter"></select>
+					<select id="lib-section" class="form-select form-select-sm" aria-label="Section"></select>
+					<select id="lib-problems" class="form-select form-select-sm lib-problems" size="6" aria-label="Problems"></select>
+				</div>
+				<form id="lib-path-form" class="input-group input-group-sm">
+					<label class="input-group-text" for="lib-path">Path</label>
+					<input id="lib-path" class="form-control font-monospace" placeholder="Library/Rochester/setDerivatives1/c1s5p8.pg" spellcheck="false">
+					<button class="btn btn-outline-primary" type="submit">Load</button>
+				</form>
+				<p id="lib-note" class="small text-body-secondary mt-1 mb-0"></p>
+			</div>
+			<textarea id="source" class="form-control font-monospace" spellcheck="false" aria-label="PG source code"></textarea>
+			<div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+				<div class="input-group input-group-sm seed-group">
+					<label class="input-group-text" for="seed">Seed</label>
+					<input type="number" id="seed" class="form-control" value="1234" min="1">
+					<button id="new-seed" class="btn btn-outline-secondary" type="button" title="Random seed">New version</button>
+				</div>
+				<div class="form-check form-check-inline m-0">
+					<input class="form-check-input" type="checkbox" id="show-hints" checked>
+					<label class="form-check-label small" for="show-hints">Hints</label>
+				</div>
+				<div class="form-check form-check-inline m-0">
+					<input class="form-check-input" type="checkbox" id="show-solutions">
+					<label class="form-check-label small" for="show-solutions">Solutions</label>
+				</div>
+				<button id="render" class="btn btn-sm btn-primary ms-auto" type="button" disabled>Render</button>
+			</div>
+		</section>
+
+		<section class="problem-pane" aria-label="Rendered problem">
+			<iframe id="problem-frame" title="Rendered problem"></iframe>
+			<div id="results" class="small"></div>
+			<p id="timing" class="small text-body-secondary mt-2"></p>
+		</section>
+	</main>
+
+	<script src="pg-client.js"></script>
+	<script src="app.js"></script>
+</body>
+</html>

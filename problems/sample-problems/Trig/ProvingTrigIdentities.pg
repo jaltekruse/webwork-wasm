@@ -1,0 +1,94 @@
+## DESCRIPTION
+## Proving trig identities
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## Static(1)
+## MO(1)
+## KEYWORDS('trigonometry', 'proving trig identities')
+
+#:% name = Proving Identities
+#:% type = Sample
+#:% subject = [trigonometry, precalculus]
+#:% categories = [proof, trigonometry]
+
+#:% section = preamble
+#: This is a scaffolded problem, so load PODLINK('scaffold.pl').
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'scaffold.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: The sine function is cleverly redefined so that when the student enters
+#: `sin(t)`, it is interpreted and evaluated internally as `exp(pi * t)` but
+#: displayed to the student as `sin(t)`. This prevents the original expression
+#: from being entered as the answer in the last step of the proof.
+Context()->variables->are(t => 'Real');
+
+# Redefine sin(x) to be e^(pi x).
+Context()->functions->remove('sin');
+
+package AltSin;
+# The next line makes the function a function from reals to reals.
+our @ISA = qw(Parser::Function::numeric);
+
+sub sin {
+    shift;
+    my $x = shift;
+    return CORE::exp($x * $pi);
+}
+
+package main;
+
+# Add the new functions to the Context.
+Context()->functions->add(sin => { class => 'AltSin', TeX => '\sin' });
+
+#:% section = statement
+BEGIN_PGML
+This problem has three parts. A part may be open if it is correct or if it is
+the first incorrect part. Clicking on the heading for a part toggles whether it
+is displayed.
+
+In this multi-part problem, we will use algebra to verify the identity
+
+>>[`\displaystyle \frac{\sin(t)}{1 - \cos(t)} = \frac{1 + \cos(t)}{\sin(t)}.`]<<
+
+END_PGML
+
+Scaffold::Begin(is_open => 'correct_or_first_incorrect');
+
+Section::Begin('Part 1');
+BEGIN_PGML
+First, the equation above can be rewritten as
+[`\displaystyle \sin(t)
+	= \left( \frac{1 + \cos(t)}{\sin(t)} \right) \cdot \Big(`]
+[_]{'1 - cos(t)'}{15} [` \Big) `].
+END_PGML
+Section::End();
+
+Section::Begin('Part 2');
+BEGIN_PGML
+Next, the equation can be rewritten as
+[`\sin(t) \cdot \big(`] [_]{'sin(t)'}{15}
+[`\big) = \big(1 + \cos(t)\big) \cdot \big(1 - \cos(t)\big)`].
+END_PGML
+Section::End();
+
+Section::Begin('Part 3');
+BEGIN_PGML
+Finally, the equation can be rewritten as
+[`\sin^2(t) =`] [_]{'1-(cos(t))^2'}{15}, which is true since
+[`\cos^2(t) + \sin^2(t) = 1`].
+
+Thus, the original identity can be derived by reversing these steps.
+END_PGML
+Section::End();
+
+Scaffold::End();
+
+ENDDOCUMENT();

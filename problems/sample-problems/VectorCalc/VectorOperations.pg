@@ -1,0 +1,88 @@
+## DESCRIPTION
+## Vector Calculus: Basic vector operations
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('vector calculus', 'vector operations')
+
+#:% name = Vector Operations
+#:% subject = Vector Calculus
+#:% type = Sample
+#:% categories = [vector]
+
+#:% section = preamble
+#: Load PODLINK('parserVectorUtils.pl') for the `non_zero_vector3D` method.
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'parserVectorUtils.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: Use `non_zero_vector3D(low, high, increment)` to randomly generate two
+#: vectors.
+#:
+#: Calling `$U->value` returns a (Perl) array of numbers which are the
+#: components of the vector `$U`. (Note that `->value` does not work on a vector
+#: whose components are non-constant formulas.)
+#:
+#: The operators `.` and `x` are defined to be the dot product and cross
+#: product, respectively, if the operands are vectors.
+#:
+#: The `norm` function computes the length of a vector, and the `unit` function
+#: computes the unit vector in the same direction as a vector.
+#:
+#: The dot and cross products as well as all `Vector` functions (including
+#: `norm` and `unit`) are undefined so that students cannot enter them in
+#: answers.
+Context('Vector');
+
+$U = non_zero_vector3D(-9, 9, 1);
+$V = non_zero_vector3D(-9, 9, 1);
+
+# value works only for vectors of constants
+@Uarray = $U->value;
+$Ucomp2 = $Uarray[1];
+
+$UdotV   = $U . $V;
+$UcrossV = $U x $V;
+$Vlength = norm($V);
+$Vunit   = unit($V);
+
+# Prevent students from entering the dot and cross products,
+# and using the vector functions such as norm and unit.
+Context()->operators->undefine('.', '><');
+Context()->functions->disable('Vector');
+
+BEGIN_PGML
+Suppose [`\vec{u} = [$U]`] and [`\vec{v} = [$V]`].
+
+a. The second component of [`\vec{u}`] is [_]{$Ucomp2}{5}
+
+b. [`\vec{u} \cdot \vec{v} =`] [_]{$UdotV}{5}
+
+c. [`\vec{u} \times \vec{v} =`] [_]{$UcrossV}{15}
+
+d. [`\left\|\vec{v}\right\| =`] [_]{$Vlength}{10}
+
+e. Enter a unit vector in the direction of [`\vec{v}`].  
+   [_]{$Vunit}{15}
+
+f. Enter a vector parallel to [`\vec{v}`].  
+   [_]{$V->cmp(parallel => 1)}{15}
+
+g. Enter a vector in the same direction as [`\vec{v}`].  
+   [_]{$V->cmp( parallel => 1, sameDirection => 1 )}{15}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();
+

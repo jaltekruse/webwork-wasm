@@ -1,0 +1,124 @@
+## DESCRIPTION
+## Volume of solids of revolution
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('Integrals', 'volume of solids of revolution')
+
+#:% name = Volume of Solids of Revolution
+#:% subject = integral calculus
+#:% type = Sample
+#:% categories = [volume, solid of revolution, disk method]
+
+#:% section = preamble
+#: Load the PODLINK('answerHints.pl') macro to give student feedback on
+#: particular incorrect answers. Note that the PODLINK('niceTables.pl') macro is
+#: loaded via the `PGML.pl` macro, and is used to construct a table that will
+#: make the answer rules for the limits of integration appear at the top and
+#: bottom of the integral symbol.
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'answerHints.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: First, the variables `x`, `dx`, `y`, and `dy` are added to the context.
+#:
+#: Then the limits of integration, the integrand, and the volume are computed.
+#:
+#: Finally, answer names are generated for all of the answers in the problem.
+#: Never use hard coded made up answer names in problems. Always obtain an
+#: answer name using the `NEW_ANS_NAME` method. Problems that use hard coded
+#: made up answer names will not work correctly in many situations. Also note
+#: that answer names are not actually needed for this problem. They could be
+#: removed entirely and it would still function correctly. However, they are
+#: needed for the method to give full credit for a correct volume answer
+#: if the answers given for the other answer rules are left blank (or are
+#: correct) that is described in the statement section.
+Context()->variables->are(x => 'Real', dx => 'Real', y => 'Real', dy => 'Real');
+
+$upper = Real('1');
+$lower = Real('0');
+$int   = Compute('(pi x^2 - pi x^4) dx');
+$vol   = Compute('2pi/15');
+
+$upperLimit = NEW_ANS_NAME();
+$lowerLimit = NEW_ANS_NAME();
+$integrand  = NEW_ANS_NAME();
+$volume     = NEW_ANS_NAME();
+
+#:% section = statement
+#: Standard PGML is used to describe the problem.
+#:
+#: Then the integral is formatted with a `LayoutTable` from the
+#: PODLINK('niceTables.pl') macro using its `PGML` syntax. Note that each answer
+#: rule is given the appropriate name from the names generated before in the
+#: last answer rule option. In addition the weight for each answer (the percent
+#: that answer is worth in the final problem score) is passed via the `weight`
+#: option to the `cmp` method.
+#:
+#: Answer hints for various incorrect answers are provided for the integrand
+#: answer by adding `->withPostFilter(AnswerHints(...))` to the `cmp` call.
+#:
+#: If you would like to give full credit for a correct volume answer if the
+#: answers given for the other answer rules are left blank (or are correct),
+#: then change
+#: `[.[_]{$vol->cmp(weight => 50)}{4}{$volume}.]*` to
+#: ```{.perl}
+#: [.
+#:     [_]{
+#:         $vol->cmp(
+#:             weight => 50,
+#:             credit => [ $upperLimit, $lowerLimit, $integrand ]
+#:         )
+#:     }{4}{$volume}
+#: .]*
+#: ```
+#:
+#: If you want to give equal credit for all answers, then remove the weight
+#: options from the `cmp` calls.
+BEGIN_PGML
+Set up and evaluate an integral for the volume of the solid of revolution
+obtained by rotating the region bounded by [`y = x`] and [`y = x^2`] about
+the [`x`]-axis.
+
+[#
+    [. .] [.[_]{$upper->cmp(weight => 5)}{4}{$upperLimit}.]*
+
+    [.[`V =`].]
+    [.[``\int``].]
+    [.
+        [_]{
+            $int->cmp(weight => 40)->withPostFilter(AnswerHints(
+                Formula('pi x^2 - pi x^4 dx') =>
+                    "Don't forget to multiply every term in the integrand by dx",
+                Formula('pi(x^2 - x^4)')   => "Don't forget the differential dx",
+                Formula('pi(x^4 - x^2)dx') => 'Is the parabola above the line?',
+                Formula('pi(x^4 - x^2)')   => 'Is the parabola above the line?',
+                Formula('pi(x - x^2)')     => 'Make sure you use the disk method.',
+                Formula('pi(x - x^2)dx')   => 'Make sure you use the disk method.',
+            ))
+        }{10}{$integrand}
+    .]
+    [.[`\;=\;`].]
+    [.[_]{$vol->cmp(weight => 50)}{4}{$volume}.]*
+
+    [. .] [.[_]{$lower->cmp(weight => 5)}{4}{$lowerLimit}.]
+#]*{
+    align      => 'rl',
+    valign     => 'middle',
+    allcellcss => { padding => '3pt' }
+}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

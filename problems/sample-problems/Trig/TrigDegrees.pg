@@ -1,0 +1,60 @@
+## DESCRIPTION
+## Trigonometry: trig functions in degrees using context TrigDegrees
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(Demos)
+## DBsection(Problem)
+## Date(2021/07/22)
+## Institution(Champlain College Saint-Lambert)
+## Author(Michele Titcombe)
+## MO(1)
+## KEYWORDS('trigonometry', 'trig functions in degrees', 'degrees')
+
+#:% name = Degrees in Trigonometric Functions
+#:% type = [technique, sample]
+#:% subject = [trigonometry, precalculus]
+#:% categories = [degrees, trigonometry]
+
+#:% section = preamble
+#: Load the PODLINK('contextTrigDegrees.pl') macro for the `TrigDegrees`
+#: context. Also load the PODLINK('contextUnits.pl') which will require that the
+#: answer has units of degrees.
+DOCUMENT();
+
+loadMacros(
+    'PGstandard.pl',         'PGML.pl',
+    'contextTrigDegrees.pl', 'contextUnits.pl',
+    'PGcourse.pl'
+);
+
+#:% section = setup
+#: Select the `TrigDegrees` context to which evaluates trig functions in
+#: degrees. This applies to any formulas or student answers in this context.
+#:
+#: The second answer is constructed with the `NumberWithUnits` method and the
+#: degree symbol is specified as the unit. Degree measures should always be
+#: given with the degree symbol.
+Context('TrigDegrees');
+
+$y = Compute('sin(30)');
+
+Context('Units')->withUnitsFor('angles');
+
+$ang = Compute('30 degrees');
+
+#:% section = statement
+#: Inform the students to give angle measurements in degrees.
+BEGIN_PGML
+Evaluate the following.  Give angles in degrees.
+
+1. [`\sin(30^{\circ}) =`] [_]{$y}
+2. [``\sin^{-1}\left(\frac{1}{2}\right) =``] [_]{$ang->with(sameUnits => 1)}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

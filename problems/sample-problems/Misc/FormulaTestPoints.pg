@@ -1,0 +1,58 @@
+## DESCRIPTION
+## Shows how to test a formula at a given set of points.
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(04/15/2023)
+## Institution(Fitchburg States)
+## Author(Peter Staab)
+## KEYWORDS('function', 'test points')
+
+#:% name = Formula Test Points
+#:% type = [sample, technique]
+#:% categories = [misc]
+#:% see_also = [FormulaDomain.pg]
+
+#:% section = preamble
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: The first line sets the limits of evaluation for the variable `x` and for any
+#: answer in the context to `[-1, 1]`.
+#:
+#: Alternatively, the limits for all variables in the context can be set with
+#: `Context()->flags->set(limits => [-1, 1])`.
+#:
+#: For another alternative, the limits for the context could be left at their
+#: default values, and instead the limits for a specific formula can be set
+#: with `$f->{limits} = [-1, 1]`.
+#:
+#: For the test points of `$g`, note that the domain of `$g` is
+#: `(-inf, -2] U [2,inf)`. One way to handle this would be to set the `limits`
+#: for the function to be some interval contained in the domain. Alternatively,
+#: as shown, the test points can be set with the `test_points` field to be a
+#: specific set of values in the domain.
+Context()->variables->set(x => { limits => [ -1, 1 ] });
+
+$f = Compute('sqrt(x + 1)');
+
+$g = Compute('sqrt(x^2 - 4)');
+$g->{test_points} = [ [-3], [-2], [2], [3], [4] ];
+
+#:% section = statement
+BEGIN_PGML
+Enter [`[$f]`]: [___]{$f}
+
+Enter [`[$g]`]: [___]{$g}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

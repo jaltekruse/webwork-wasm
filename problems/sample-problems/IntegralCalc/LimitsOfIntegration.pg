@@ -1,0 +1,93 @@
+## DESCRIPTION
+## Answer rules in limits of integration
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('Integrals', 'answer blanks in limits of integration')
+
+#:% name = Answer Rules in Limits of Integration
+#:% type = Sample
+#:% subject = integral calculus
+#:% categories = [antiderivatives]
+
+#:% section = preamble
+#: The PODLINK('niceTables.pl') macro is used to construct a table containing
+#: the answer rules in the limits of integration.  The PODLINK('answerHints.pl')
+#: macro is used to help guide students toward the correct answer.
+DOCUMENT();
+
+loadMacros(
+    'PGstandard.pl', 'PGML.pl', 'niceTables.pl', 'answerHints.pl',
+    'PGcourse.pl'
+);
+
+#:% section = setup
+#: The variables `x`, `t`, `dx`, and `dt` are added to the context. Note that
+#: `dx` would be incorrect for a student to use in the answer and `dt` is the
+#: correct differential.
+#:
+#: The `LayoutTable` of PODLINK('niceTables.pl') is used to display the definite
+#: integral.  Note that the option `align => 'rl'` is used to make the
+#: formatting look right.
+Context()->variables->are(
+    x  => 'Real',
+    dx => 'Real',
+    t  => 'Real',
+    dt => 'Real'
+);
+
+$integral = LayoutTable(
+    [
+        [ ' ', ans_rule(4) ],
+        [
+            '\(f(x)= \) ' . ans_rule(10) . ' \(+\)',
+            '\(\displaystyle \int \;\;\)' . ans_rule(10)
+        ],
+        [ ' ', ans_rule(4) ],
+    ],
+    align      => 'rl',
+    allcellcss => { padding => '3pt' }
+);
+
+$fx = Formula("sin(x)");
+$ft = Formula("sin(t)");
+
+#:% section = statement
+#: The integral is placed in the problem with the `[$integral]*` which displays
+#: the table.
+BEGIN_PGML
+Find a formula for the function [`f(x)`] such that [`f'(x) = [$fx]`] and
+[`f(2) = 5`].  Use [`t`] for the variable of integration.
+
+[$integral]*
+END_PGML
+
+#:% section = answer
+#: The answer rules are inserted using `ans_rule`, so `ANS` must be called to
+#: associate the answer evaluators to those answer rules.  The `AnswerHints`
+#: method is used to provide hints that guide the students to the correct
+#: answer. Note that hints for the incorrect answers that use `x` for the
+#: variable instead of `t` are cases that a hint is provided for.
+ANS(Compute('x')->cmp());
+ANS(Compute('5')->cmp());
+ANS(
+    Compute("$ft * dt")->cmp()->withPostFilter(AnswerHints(
+        Formula("$fx")    => "Are you using the correct variable?",
+        Formula("$fx*dx") => "Are you using the correct variable?",
+        Formula("$ft")    => "Don't forget the differential \(dt\).",
+    ))
+);
+ANS(Compute('2')->cmp());
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

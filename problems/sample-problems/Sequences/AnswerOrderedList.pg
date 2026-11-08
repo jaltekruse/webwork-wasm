@@ -1,0 +1,50 @@
+## DESCRIPTION
+## Answer is an ordered list
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('integral calculus', 'answer is an ordered list')
+
+#:% name = Ordered List
+#:% type = Sample
+#:% subject = Sequences and Series
+#:% categories = [sequences, answers]
+
+#:% section = preamble
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: Create an array `@seq` with the first two elements of the sequence that will
+#: be the answer.  The next 5 elements are added in a `for` loop. Then construct
+#: a MathObject `List` by calling `List` on that array. Specify that this
+#: `List` is ordered by passing the option `ordered => 1` to the `cmp` method.
+@seq = (1, 1);
+for (2 .. 6) {
+    $seq[$_] = $seq[ $_ - 1 ] + $seq[ $_ - 2 ];
+}
+
+$answer_cmp = List(@seq)->cmp(ordered => 1);
+
+#:% section = statement
+BEGIN_PGML
+If [`s_1 = [$seq[0]]`], [`s_2 = [$seq[1]]`], and [`s_n = s_{n-1} + s_{n-2}`],
+find the first seven terms of this sequence, including [`s_1`] and [`s_2`].
+Enter your answer as a comma separated list of numbers.
+
+Sequence = [_]{$answer_cmp}{20}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

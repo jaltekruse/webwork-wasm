@@ -1,0 +1,96 @@
+## DESCRIPTION
+## Difference quotients
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('differential calculus', 'difference quotients')
+
+#:% name = Differentiate a Function
+#:% type = Sample
+#:% subject = differential calculus
+#:% categories = [difference quotient]
+
+#:% section = preamble
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'PGcourse.pl');
+
+#:% section = setup
+#: The differentiation operator is `->D('x')`.
+#:
+#: The main difference between the `eval` and `substitute` methods is
+#:
+#:   - `eval` returns a `Real` (a number)
+#:   - `substitute` returns a `Formula`
+#:
+#: For a constant answer either the `eval` method can be used in which case the
+#: answer would be a `Real`, or the `substitute` method can be used in which
+#: case the answer would be a constant `Formula`.
+#:
+#: For example, the `eval` method could be used as in
+#: `$ans3 = $fx->eval(x => $a * pi, k => $k)` to obtain a `Real` which will
+#: display as a single number in decimal format. Note that the `eval` method
+#: requires values for all variables in the formula.  For example, calling
+#: `$fx->eval(k => $k)` gives errors, because a value is not provided for the
+#: variable `x`.
+#:
+#: The substitute method can be used instead which gives more control over how
+#: the answer will be displayed. In particular, the context flag
+#: `reduceConstants` controls whether simple constant expressions like `2 * 4`
+#: or `5 * pi` will be reduced to numbers in decimal format, the flag
+#: `reduceConstantFunctions` controls whether or not expressions such as
+#: `sqrt(3)` or `sin(3)` are evaluated to numbers or left as a function
+#: evaluated at a number, and setting the context flag `formatStudentAnswer =>
+#: 'parsed'` will prevent the student's "Entered" answer from being reduced to a
+#: single number in decimal format, and will display constants like `pi` instead
+#: of an approximation being displayed.
+#:
+#: It is important to note that the above rules do not apply to the numbers
+#: passed to the `substitute` method. So `$a * pi` will be converted into
+#: decimal form before it is used by the `substitute` method.
+#:
+#: Note that neither the `eval` method or `substitute` method can be used to
+#: perform function composition. Only numbers can be plugged in, not formulas.
+#:
+#: For more details see PROBLINK('EvalVersusSubstitute.pg') and
+#: PROBLINK('ConstantsInProblems.pg').
+Context()->variables->add(k => 'Real');
+Context()->flags->set(
+    reduceConstants         => 0,
+    reduceConstantFunctions => 0,
+    formatStudentAnswer     => 'parsed',
+);
+
+$a = random(6, 9);
+$k = random(3, 5);
+
+$f  = Formula('k x^2');
+$fx = $f->D('x');
+
+$ans1 = $fx;
+$ans2 = $fx->substitute(k => $k);
+$ans3 = $fx->substitute(x => $a * pi, k => $k);
+
+#:% section = statement
+BEGIN_PGML
+Suppose [`f(x) = [$f]`] where [`k`] is a constant.
+
+a. [`f'(x) =`] [_____]{$ans1}
+
+b. If [`k = [$k]`] then [`f'(x) =`] [_____]{$ans2}
+
+c. If [`k = [$k]`] then [`f'([$a]\pi) =`] [_____]{$ans3}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

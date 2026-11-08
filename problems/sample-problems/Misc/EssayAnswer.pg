@@ -1,0 +1,71 @@
+## DESCRIPTION
+## Essay answer template
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('essay answer', 'template')
+
+#:% name = Essay Answer
+#:% type = [Sample, technique]
+#:% categories = [essay]
+
+#:% section = preamble
+#: This uses PODLINK('PGessaymacros.pl') for essay answers and
+#: PODLINK('parserPopUp.pl') for multiple choice drop down menus.
+DOCUMENT();
+
+loadMacros(
+    'PGstandard.pl',  'PGML.pl',
+    'parserPopUp.pl', 'PGessaymacros.pl',
+    'PGcourse.pl'
+);
+
+#:% section = setup
+$popup = PopUp(
+    [ 'Choose', 'True', 'False' ],    # choices
+    'False'                           # correct answer
+);
+
+$a = random(2, 5);
+
+$f1 = Compute("ln(x(x - $a))");
+$f2 = Compute("ln(x) + ln(x - $a)");
+
+#:% section = statement
+#: Clearly communicate to the student the expectations of the problem and how it
+#: will be graded.  The `essay_box(w, h)` method takes inputs for the initial
+#: width and height of the text area answer rule.
+#:
+#: Note that `essay_cmp` is a method that is not associated with any object
+#: (i.e., it is **not** `$essay->cmp`).
+#:
+#: An essay answer must be graded manually by the instructor.  Hand grading is
+#: done either
+#:
+#:  1. by viewing the homework set and clicking the **Grade Problem** link in
+#:     the rightmost column of the problem list, or
+#:  2. by clicking the **Show Problem Grader** button in the problem, or
+#:  3. by clicking on **Statistics** in the Instructor Tools menu, selecting the
+#:     homework set, and clicking the **Manual Grader** link under the problem
+#:     number, or
+#:  4. by clicking the **Grade Problem** link after the problem number on the
+#:     **Set Detail** page.
+#:
+BEGIN_PGML
+Determine if the following statement is true or false, and then explain your
+answer.  Your explanation will be graded manually at a later time.
+
+[_]{$popup}: For all real numbers [`x`], [`[$f1] = [$f2]`].
+
+Please explain your reasoning in the answer box below.
+[@ ANS(essay_cmp()); essay_box(8, 60) @]*
+END_PGML
+
+ENDDOCUMENT();
+

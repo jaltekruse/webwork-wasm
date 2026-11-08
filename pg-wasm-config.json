@@ -1,0 +1,5 @@
+{
+	"mounts": { "Library/": "https://raw.githubusercontent.com/openwebwork/webwork-open-problem-library/main/OpenProblemLibrary/", "Contrib/": "https://raw.githubusercontent.com/openwebwork/webwork-open-problem-library/main/Contrib/", "problems/": "problems/" },
+	"libraryIndex": "opl/index.json",
+	"tikzPackages": ["amsbsy","amsfonts","amsgen","amsmath","amsopn","amssymb","amstext","array","etoolbox","expl3","hf-tikz","ifthen","pgfcalendar","pgfplots","tikz-3dplot","tikz-cd","xparse"]
+}

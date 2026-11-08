@@ -1,0 +1,9 @@
+{
+	"name": "PG in the Browser",
+	"short_name": "PG",
+	"description": "Render and grade WeBWorK PG problems offline, with Perl compiled to WebAssembly.",
+	"start_url": "./",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#2c3e50"
+}

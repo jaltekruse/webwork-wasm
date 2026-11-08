@@ -1,0 +1,670 @@
+[
+	{
+		"path": "derivative.pg",
+		"title": "A polynomial derivative, graded as a formula (pg-wasm demo problem)"
+	},
+	{
+		"path": "sample-problems/Algebra/AlgebraicFractionAnswer.pg",
+		"title": "Algebraic fraction answer requiring simplification"
+	},
+	{
+		"path": "sample-problems/Algebra/AnswerBlankInExponent.pg",
+		"title": "Answer blank in the exponent"
+	},
+	{
+		"path": "sample-problems/Algebra/AnswerUpToMultiple.pg",
+		"title": "Answers up to multiplication"
+	},
+	{
+		"path": "sample-problems/Algebra/DomainRange.pg",
+		"title": "Domain and range of a function using inequalities"
+	},
+	{
+		"path": "sample-problems/Algebra/DynamicGraph.pg",
+		"title": "Dynamically generated graph of a function"
+	},
+	{
+		"path": "sample-problems/Algebra/EquationDefiningFunction.pg",
+		"title": "An equation defining a function"
+	},
+	{
+		"path": "sample-problems/Algebra/EquationImplicitFunction.pg",
+		"title": "An equation implicitly defining a function"
+	},
+	{
+		"path": "sample-problems/Algebra/ExpandedPolynomial.pg",
+		"title": "This problem gives the student a quadratic in factored form and asks for"
+	},
+	{
+		"path": "sample-problems/Algebra/FactoredPolynomial.pg",
+		"title": "Factored polynomial"
+	},
+	{
+		"path": "sample-problems/Algebra/FractionAnswer.pg",
+		"title": "Fraction answer"
+	},
+	{
+		"path": "sample-problems/Algebra/FunctionDecomposition.pg",
+		"title": "Decompose a function into two functions"
+	},
+	{
+		"path": "sample-problems/Algebra/FunctionPlot.pg",
+		"title": "A dynamic plot of a quadratic function"
+	},
+	{
+		"path": "sample-problems/Algebra/GraphToolCircle.pg",
+		"title": "Interactive graphing tool problem that asks the student to plot a circle."
+	},
+	{
+		"path": "sample-problems/Algebra/GraphToolCubic.pg",
+		"title": "Interactive graphing tool problem that asks the student to plot a cubic."
+	},
+	{
+		"path": "sample-problems/Algebra/GraphToolCustomChecker.pg",
+		"title": "Interactive graphing tool problem with a custom checker."
+	},
+	{
+		"path": "sample-problems/Algebra/GraphToolLine.pg",
+		"title": "Interactive graphing tool problem that asks the student to plot a line."
+	},
+	{
+		"path": "sample-problems/Algebra/GraphToolNumberLine.pg",
+		"title": "Interactive graphing tool problem that asks the student to plot a circle."
+	},
+	{
+		"path": "sample-problems/Algebra/GraphToolPoints.pg",
+		"title": "Interactive graphing tool problem that asks the student to plot points."
+	},
+	{
+		"path": "sample-problems/Algebra/InequalityAnswer.pg",
+		"title": "Answer is an inequality"
+	},
+	{
+		"path": "sample-problems/Algebra/LinearInequality.pg",
+		"title": "Enter a linear inequality based on a description"
+	},
+	{
+		"path": "sample-problems/Algebra/Logarithms.pg",
+		"title": "Laws of logarithms"
+	},
+	{
+		"path": "sample-problems/Algebra/NoSolution.pg",
+		"title": "Answer that may not be an equation."
+	},
+	{
+		"path": "sample-problems/Algebra/PointAnswers.pg",
+		"title": "Answers are lists of points"
+	},
+	{
+		"path": "sample-problems/Algebra/ScalingTranslating.pg",
+		"title": "Scaling and translating functions"
+	},
+	{
+		"path": "sample-problems/Algebra/SimpleFactoring.pg",
+		"title": "Factored polynomial"
+	},
+	{
+		"path": "sample-problems/Algebra/SolutionForEquation.pg",
+		"title": "Answer is any solution to an equation"
+	},
+	{
+		"path": "sample-problems/Algebra/StringOrOtherType.pg",
+		"title": "Answer could be a string or another data type"
+	},
+	{
+		"path": "sample-problems/Algebra/TableOfValues.pg",
+		"title": "Function table of values"
+	},
+	{
+		"path": "sample-problems/Algebra/UnorderedAnswers.pg",
+		"title": "Answers can be entered in any order into answer blanks"
+	},
+	{
+		"path": "sample-problems/Arithmetic/UnitConversion.pg",
+		"title": "Answer is a number or formula with units"
+	},
+	{
+		"path": "sample-problems/Complex/ComplexOperations.pg",
+		"title": "This demonstrates basic operations with complex numbers."
+	},
+	{
+		"path": "sample-problems/Complex/LimitedComplex.pg",
+		"title": "This shows the capabilities of the LimitedComplex context."
+	},
+	{
+		"path": "sample-problems/Complex/OtherOperations.pg",
+		"title": "Other complex operations."
+	},
+	{
+		"path": "sample-problems/DiffCalc/AnswerWithUnits.pg",
+		"title": "Answer is a number or formula with units"
+	},
+	{
+		"path": "sample-problems/DiffCalc/DifferenceQuotient.pg",
+		"title": "Difference quotients"
+	},
+	{
+		"path": "sample-problems/DiffCalc/DifferentiateFunction.pg",
+		"title": "Difference quotients"
+	},
+	{
+		"path": "sample-problems/DiffCalc/LinearApprox.pg",
+		"title": "Linear approximation"
+	},
+	{
+		"path": "sample-problems/DiffCalcMV/ContourPlot.pg",
+		"title": "Creating a contour plot"
+	},
+	{
+		"path": "sample-problems/DiffCalcMV/ImplicitPlane.pg",
+		"title": "Multivariable differential calculus: answer is an equation for a plane"
+	},
+	{
+		"path": "sample-problems/DiffCalcMV/VectorFieldPlot.pg",
+		"title": "Use the plots.pl macro to generate a vector/direction field."
+	},
+	{
+		"path": "sample-problems/DiffEq/GeneralSolutionODE.pg",
+		"title": "Use a custom answer checkers for ODEs to determine the general solution of a"
+	},
+	{
+		"path": "sample-problems/DiffEq/HeavisideStep.pg",
+		"title": "Adding the Heaviside function to the context."
+	},
+	{
+		"path": "sample-problems/DiffEq/PrimesInFormulas.pg",
+		"title": "Allowing primes in student answers."
+	},
+	{
+		"path": "sample-problems/Geometry/LineSegmentGraphTool.pg",
+		"title": "Shows a triangle tool within the GraphTool."
+	},
+	{
+		"path": "sample-problems/Geometry/QuadrilateralGraphTool.pg",
+		"title": "Shows a quadrilateral tool within the GraphTool."
+	},
+	{
+		"path": "sample-problems/Geometry/TriangleGraphTool.pg",
+		"title": "Shows a triangle tool within the GraphTool."
+	},
+	{
+		"path": "sample-problems/IntegralCalc/DoubleIntegral.pg",
+		"title": "Setting up double integrals"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/GraphShading.pg",
+		"title": "Dynamically generated graph of a function with shading"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/GraphShadingPlot.pg",
+		"title": "Dynamically generated graph of a function with shading"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/IndefiniteIntegrals.pg",
+		"title": "Indefinite integrals"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/LimitsOfIntegration.pg",
+		"title": "Answer rules in limits of integration"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/RiemannSumPlot.pg",
+		"title": "Plot of a function with its Rieman Sum rectangles"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/RiemannSums.pg",
+		"title": "Integral calculus: Interpreting Riemann sums in terms of area"
+	},
+	{
+		"path": "sample-problems/IntegralCalc/VolumeOfRevolution.pg",
+		"title": "Volume of solids of revolution"
+	},
+	{
+		"path": "sample-problems/LinearAlgebra/MatrixAnswer1.pg",
+		"title": "Answer is a matrix"
+	},
+	{
+		"path": "sample-problems/LinearAlgebra/MatrixAnswer2.pg",
+		"title": "Answer is a matrix"
+	},
+	{
+		"path": "sample-problems/LinearAlgebra/MatrixCustomAnswerChecker.pg",
+		"title": "Answer is a pair of matrices that require a custom answer checker"
+	},
+	{
+		"path": "sample-problems/LinearAlgebra/MatrixOperations.pg",
+		"title": "Find the product of two matrices if the product is defined."
+	},
+	{
+		"path": "sample-problems/LinearAlgebra/RowOperations.pg",
+		"title": "Row operations on a Matrix"
+	},
+	{
+		"path": "sample-problems/Misc/ChemicalReaction.pg",
+		"title": "Chemical reaction template"
+	},
+	{
+		"path": "sample-problems/Misc/DraggableProof.pg",
+		"title": "A Simple draggable proof."
+	},
+	{
+		"path": "sample-problems/Misc/DynamicGraphPolygon.pg",
+		"title": "Dynamically generated graph of a function"
+	},
+	{
+		"path": "sample-problems/Misc/EssayAnswer.pg",
+		"title": "Essay answer template"
+	},
+	{
+		"path": "sample-problems/Misc/FormulaAnswer.pg",
+		"title": "Formula answer template"
+	},
+	{
+		"path": "sample-problems/Misc/FormulaDomain.pg",
+		"title": "Formula answer with domain issues template"
+	},
+	{
+		"path": "sample-problems/Misc/FormulaTestPoints.pg",
+		"title": "Shows how to test a formula at a given set of points."
+	},
+	{
+		"path": "sample-problems/Misc/IframeEmbedding.pg",
+		"title": "Iframe embedding template"
+	},
+	{
+		"path": "sample-problems/Misc/ManyMultipleChoice.pg",
+		"title": "Many multiple choice template"
+	},
+	{
+		"path": "sample-problems/Misc/Matching.pg",
+		"title": "Matching question template"
+	},
+	{
+		"path": "sample-problems/Misc/MatchingAlt.pg",
+		"title": "Matching question template"
+	},
+	{
+		"path": "sample-problems/Misc/MatchingGraphs.pg",
+		"title": "Matching problem with graphs"
+	},
+	{
+		"path": "sample-problems/Misc/MultipleChoiceCheckbox.pg",
+		"title": "Multiple choice template"
+	},
+	{
+		"path": "sample-problems/Misc/MultipleChoicePopup.pg",
+		"title": "Multiple choice template"
+	},
+	{
+		"path": "sample-problems/Misc/MultipleChoiceRadio.pg",
+		"title": "Multiple choice template"
+	},
+	{
+		"path": "sample-problems/Misc/RandomPerson.pg",
+		"title": "Shows the use of the randomNamesPronouns.pl macro"
+	},
+	{
+		"path": "sample-problems/Misc/Scaffolding.pg",
+		"title": "scaffolding template"
+	},
+	{
+		"path": "sample-problems/Parametric/ParametricEquationAnswers.pg",
+		"title": "Check student answers that are parametric equations"
+	},
+	{
+		"path": "sample-problems/Parametric/ParametricPlot.pg",
+		"title": "Graphing a parametric curve."
+	},
+	{
+		"path": "sample-problems/Parametric/ParametricPlotAlt.pg",
+		"title": "Graphing a parametric curve."
+	},
+	{
+		"path": "sample-problems/Parametric/PolarGraph.pg",
+		"title": "Graphing a polar curve given by r = f(theta)"
+	},
+	{
+		"path": "sample-problems/Parametric/PolarGraphPlot.pg",
+		"title": "Graphing a polar curve given by r = f(theta)"
+	},
+	{
+		"path": "sample-problems/Parametric/Spacecurve.pg",
+		"title": "Parametric equations: parametric curve in space"
+	},
+	{
+		"path": "sample-problems/Parametric/SpaceCurveGraph.pg",
+		"title": "Parametric equations: graphing a parametric curve in space"
+	},
+	{
+		"path": "sample-problems/Parametric/SurfaceGraph.pg",
+		"title": "Parametric equations: graphing a parametric curve in space"
+	},
+	{
+		"path": "sample-problems/Parametric/VectorParametricDerivative.pg",
+		"title": "Parametric equations: parametric curve in space"
+	},
+	{
+		"path": "sample-problems/Parametric/VectorParametricFunction.pg",
+		"title": "Parametric equations: parametric curve in space"
+	},
+	{
+		"path": "sample-problems/Parametric/VectorParametricLines.pg",
+		"title": "Parametric equations: vector parametric lines"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/AdaptiveParameters.pg",
+		"title": "Utilizing adaptive parameters in checkers."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/AnswerHints.pg",
+		"title": "Shows how to provide answer hints to students."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/AnswerInExponent.pg",
+		"title": "Provides an answer blank in an exponent."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/AnswerIsSolutionToEquation.pg",
+		"title": "The answer is a solution to an equation."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/AnyAnswerMarkedCorrect.pg",
+		"title": "Shows how to implement any answer marked correct."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/AskSage.pg",
+		"title": "Make a call to a Sage cell server from within a problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/CalculatingWithPoints.pg",
+		"title": "Perform calculations with Points."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/ComposingFunctions.pg",
+		"title": "Shows how to check that the answer is the composition of two functions."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/ConstantsInProblems.pg",
+		"title": "Provides constants in a PG problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/CustomAnswerCheckers.pg",
+		"title": "This provides a custom answer checker."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/CustomAnswerListChecker.pg",
+		"title": "This shows how to check an arbitrary list of student answers."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/DataTables.pg",
+		"title": "This shows how to present and format a table for data."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/DefiningFunctions.pg",
+		"title": "Shows how to add a general function as an input option."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/DifferentiatingFormulas.pg",
+		"title": "This shows how to check \"arbitrary\" conditions on the student's answer."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/DigitsTolType.pg",
+		"title": "This describes an alternative way for determining"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/DisableFunctions.pg",
+		"title": "This shows how to disable functions allowed in student answers."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/DraggableSubsets.pg",
+		"title": "This shows how to setup a set of draggable items to sort."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/EquationEvaluators.pg",
+		"title": "This code shows how to check student answers that are equations."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/EquationsDefiningFunctions.pg",
+		"title": "This PG code shows how to check student answers that are equations that"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/ErrorMessageCustomization.pg",
+		"title": "This shows how to customize (remap) the error messages students receive after submitting an"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/EvalVersusSubstitute.pg",
+		"title": "Shows the difference between eval and substitute for MathObject Formulas"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/ExtractingCoordinatesFromPoint.pg",
+		"title": "This problem shows how to extract the coordinates from a point."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/FactoringAndExpanding.pg",
+		"title": "This shows how to check answers that require students to factor or expand"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/FormattingDecimals.pg",
+		"title": "Formatting decimals and using logarithmic functions."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/FormulasToConstants.pg",
+		"title": "Formulas up to additive constants."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/GraphsInTables.pg",
+		"title": "Creating a set of graphs and displaying the options in a table."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/HtmlLinks.pg",
+		"title": "This shows how to make an html link in a PG problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/Images.pg",
+		"title": "Inserting images in PGML."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/InequalityEvaluators.pg",
+		"title": "This shows how to use inqualities in a problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/IntervalEvaluators.pg",
+		"title": "This shows how to use intervals in a problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/Knowls.pg",
+		"title": "This shows how to use intervals in a problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/LayoutTable.pg",
+		"title": "This shows how to use LayoutTable for layout."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/Multianswer.pg",
+		"title": "A simple multianswer problem."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/NamedAnswerRules.pg",
+		"title": "Add buttons to the MathQuill toolbar for a particular"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/NumericalTolerance.pg",
+		"title": "Explains the difference in tolerance type and numerical tolerance."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/OtherVariables.pg",
+		"title": "Add variables to the context."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/Percent.pg",
+		"title": "This demonstrates the Percent context."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/RandomFunction.pg",
+		"title": "This demonstrates how to get a random function."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/RestrictAnswerToFraction.pg",
+		"title": "Restricting answers that should reduce to a fraction."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/RestrictingFunctions.pg",
+		"title": "Restricting answers that should reduce to a constant."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/SimplePopUp.pg",
+		"title": "Answers are lists of points"
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/StaticImages.pg",
+		"title": "Show a static image."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/StringsInContext.pg",
+		"title": "Shows how to add strings to the context."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/TikZImages.pg",
+		"title": "Create a graph using tikz."
+	},
+	{
+		"path": "sample-problems/ProblemTechniques/WeightedGrader.pg",
+		"title": "This shows how to use intervals in a problem."
+	},
+	{
+		"path": "sample-problems/Sequences/AnswerOrderedList.pg",
+		"title": "Answer is an ordered list"
+	},
+	{
+		"path": "sample-problems/Sequences/ExplicitSequence.pg",
+		"title": "Integral calculus: sequences"
+	},
+	{
+		"path": "sample-problems/Sequences/RecursiveSequence.pg",
+		"title": "Integral calculus: sequences and recursively defined functions"
+	},
+	{
+		"path": "sample-problems/Sequences/SeriesTest.pg",
+		"title": "Series: limit comparison test"
+	},
+	{
+		"path": "sample-problems/Snippets/CommentsForInstructors.pg",
+		"title": "Shows a Comment"
+	},
+	{
+		"path": "sample-problems/Statistics/BarGraph.pg",
+		"title": "Find the mean and standard deviation of a list of numbers."
+	},
+	{
+		"path": "sample-problems/Statistics/BarGraphStatPlot.pg",
+		"title": "Find the mean and standard deviation of a list of numbers."
+	},
+	{
+		"path": "sample-problems/Statistics/BoxPlot.pg",
+		"title": "Produce a box plot from both a set of numbers and from the quartiles."
+	},
+	{
+		"path": "sample-problems/Statistics/DonutPlot.pg",
+		"title": "Produce a donut plot."
+	},
+	{
+		"path": "sample-problems/Statistics/Histogram.pg",
+		"title": "Find the mean and standard deviation of a list of numbers."
+	},
+	{
+		"path": "sample-problems/Statistics/LinearRegression.pg",
+		"title": "Find the mean and standard deviation of a list of numbers."
+	},
+	{
+		"path": "sample-problems/Statistics/MeanStdDev.pg",
+		"title": "Find the mean and standard deviation of a list of numbers."
+	},
+	{
+		"path": "sample-problems/Statistics/MultiBoxPlot.pg",
+		"title": "Produce multiple box plots."
+	},
+	{
+		"path": "sample-problems/Statistics/PieChart.pg",
+		"title": "Produce a pie chart."
+	},
+	{
+		"path": "sample-problems/Statistics/ScatterPlot.pg",
+		"title": "Scatter Plot with best-fit line"
+	},
+	{
+		"path": "sample-problems/Statistics/ScatterPlotStatPlot.pg",
+		"title": "Scatter Plot with best-fit line using StatPlots"
+	},
+	{
+		"path": "sample-problems/Trig/DisableFunctionsTrig.pg",
+		"title": "Disable functions and require exact fractions as answers."
+	},
+	{
+		"path": "sample-problems/Trig/DraggableIdentity.pg",
+		"title": "A draggable proof to prove a trigonmetric identity."
+	},
+	{
+		"path": "sample-problems/Trig/PeriodicAnswers.pg",
+		"title": "Periodic answers"
+	},
+	{
+		"path": "sample-problems/Trig/ProvingTrigIdentities.pg",
+		"title": "Proving trig identities"
+	},
+	{
+		"path": "sample-problems/Trig/SpecialTrigValues.pg",
+		"title": "Displays values of trig functions on the unit circle"
+	},
+	{
+		"path": "sample-problems/Trig/TrigDegrees.pg",
+		"title": "Trigonometry: trig functions in degrees using context TrigDegrees"
+	},
+	{
+		"path": "sample-problems/Trig/TrigIdentities.pg",
+		"title": "Trigonometric identities"
+	},
+	{
+		"path": "sample-problems/VectorCalc/CylindricalGraph3D.pg",
+		"title": "This shows an interactive graph in 3D in cylindrical coordinates."
+	},
+	{
+		"path": "sample-problems/VectorCalc/DirectionField.pg",
+		"title": "Vector Calculus: graph of a 2D direction field"
+	},
+	{
+		"path": "sample-problems/VectorCalc/GraphToolVectors.pg",
+		"title": "Shows a triangle tool within the GraphTool."
+	},
+	{
+		"path": "sample-problems/VectorCalc/RectangularGraph3D.pg",
+		"title": "This shows an interactive graph in 3D in rectangular coordinates."
+	},
+	{
+		"path": "sample-problems/VectorCalc/VectorFieldGraph2D.pg",
+		"title": "Vector Calculus: graph of a 2D vector field"
+	},
+	{
+		"path": "sample-problems/VectorCalc/VectorFieldGraph3D/VectorFieldGraph3D1.pg",
+		"title": "Vector Calculus: graph of a 3D vector field"
+	},
+	{
+		"path": "sample-problems/VectorCalc/VectorLineSegment1.pg",
+		"title": "A Vector-value parametric line segment with a general parameterization"
+	},
+	{
+		"path": "sample-problems/VectorCalc/VectorLineSegment2.pg",
+		"title": "A Vector-value parametric line segment for a specific values of the parameter."
+	},
+	{
+		"path": "sample-problems/VectorCalc/VectorOperations.pg",
+		"title": "Vector Calculus: Basic vector operations"
+	},
+	{
+		"path": "sample-problems/VectorCalc/VectorParametricLine.pg",
+		"title": "A Vector-value parametric line"
+	},
+	{
+		"path": "sample-problems/VectorCalc/Vectors.pg",
+		"title": "This shows how to use vectors in a problem."
+	}
+]

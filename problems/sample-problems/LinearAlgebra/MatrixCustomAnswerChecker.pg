@@ -1,0 +1,67 @@
+## DESCRIPTION
+## Answer is a pair of matrices that require a custom answer checker
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(PGML tutorial 2015)
+## Date(06/01/2015)
+## Institution(Hope College)
+## Author(Paul Pearson)
+## MO(1)
+## KEYWORDS('matrix','custom answer checker','multianswer')
+
+#:% name = Custom Matrix Answer Checker
+#:% type = Sample
+#:% subject = linear algebra
+#:% categories = [answers, matrix]
+
+#:% section = preamble
+#: Since the answer will depend on two matrix inputs at once, the
+#: PODLINK('parserMultiAnswer.pl') macro must be loaded.
+DOCUMENT();
+
+loadMacros('PGstandard.pl', 'PGML.pl', 'parserMultiAnswer.pl', 'PGcourse.pl');
+
+$showPartialCorrectAnswers = 0;
+
+#:% section = setup
+#: Construct two matrices `$A` and `$B` that do not commute. Use a `$multians`
+#: object with a custom answer checker subroutine. The answer checker uses
+#: `my ($c, $s, $ansHash) = @_` to extract the inputs (the correct answer, the
+#: student answer, and the answer hash). The checker returns 1 if
+#: `$s->[0] * $s->[1] != $s->[1] * $s->[0]` is true and 0 otherwise. Note that
+#: `$s->[0]` is the MathObject representation of the student's answer for the
+#: first matrix, and $s->[1] is the MathObject representation of the student's
+#: answer for second matrix.
+Context('Matrix');
+
+$A = Matrix([ [ 1, 1 ], [ 0, 1 ] ]);
+$B = Matrix([ [ 1, 0 ], [ 1, 1 ] ]);
+
+$multians = MultiAnswer($A, $B)->with(
+    singleResult => 1,
+    checker      => sub {
+        my ($c, $s, $ansHash) = @_;
+        return $s->[0] * $s->[1] != $s->[1] * $s->[0] ? 1 : 0;
+    }
+);
+
+#:% section = statement
+#:  Make sure that both answer arrays are called as methods on the `$multians`
+#: object.
+BEGIN_PGML
+Give an example of two [`2 \times 2`] matrices [`A`] and [`B`] such that
+[`AB \ne BA`] .
+
+	[`A =`] [_____]*{$multians}
+
+	[`B =`] [_____]*{$multians}
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();

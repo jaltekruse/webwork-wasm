@@ -1,0 +1,61 @@
+## DESCRIPTION
+## A Vector-value parametric line
+## ENDDESCRIPTION
+
+## DBsubject(WeBWorK)
+## DBchapter(WeBWorK tutorial)
+## DBsection(Problem Techniques)
+## Date(06/01/2008)
+## Institution(University of Michigan)
+## Author(Gavin LaRose)
+## MO(1)
+## KEYWORDS('interval')
+
+# created as a full problem by Peter Staab  2023.06.02
+
+#:% name = Vector-valued Parametric Line
+#:% type = [technique, sample]
+#:% categories = vector
+#:% subject = Vector Calculus
+#:% see_also = [VectorLineSegment1.pg, VectorLineSegment2.pg]
+
+#:% section = preamble
+#: The PODLINK('parserVectorUtils.pl') macro provides the `non_zero_point3D` and
+#: `non_zero_vector3D` methods. The macro PODLINK('parserParametricLine.pl')
+#: provides the `ParametricLine` function used for the answer.
+DOCUMENT();
+loadMacros(
+    'PGstandard.pl',        'PGML.pl',
+    'parserVectorUtils.pl', 'parserParametricLine.pl',
+    'PGcourse.pl'
+);
+
+#:% section = setup
+#: Generate a random three dimensional initial point `$P` using the
+#: `non_zero_point3D` method, and a random three dimensional displacement vector
+#: `$disp` using the `non_zero_vector3D` method. Use the `ParametricLine` method
+#: to create the answer which is the parametric line through `$P` in the
+#: direction of `$disp`.
+Context('Vector');
+Context()->variables->are(t => 'Real');
+
+$P    = non_zero_point3D();
+$disp = non_zero_vector3D();
+$line = ParametricLine("$P + t * $disp");
+
+#:% section = statement
+BEGIN_PGML
+Find a vector parametric equation for the line through points [`P = [$P]`] and
+[`Q = [@ Point($P + $disp) @]`].
+
+[`\vec{r}(t) =`] [_]{$line}{15}
+
+Give A vector in the form  [|<x(t), y(t), z(t)>|]*.
+END_PGML
+
+#:% section = solution
+BEGIN_PGML_SOLUTION
+Solution explanation goes here.
+END_PGML_SOLUTION
+
+ENDDOCUMENT();
